@@ -322,6 +322,8 @@ img { max-width: 100%; height: auto; }
   padding: 28px 32px;
   background: linear-gradient(135deg, var(--brand-50), var(--sub-50));
   border-bottom: 1px solid var(--gray-200);
+  min-height: 120px;
+  display: flex; flex-direction: column; justify-content: center;
 }
 .case-card .case-header .industry {
   font-size: 11px; color: var(--brand); font-weight: 700;
