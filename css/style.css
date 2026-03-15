@@ -315,6 +315,7 @@ img { max-width: 100%; height: auto; }
 .case-card {
   background: var(--white); border-radius: var(--radius);
   border: 1px solid var(--gray-200); overflow: hidden; transition: all var(--transition);
+  display: flex; flex-direction: column;
 }
 .case-card:hover { box-shadow: var(--shadow-lg); transform: translateY(-4px); }
 .case-card .case-header {
@@ -327,8 +328,8 @@ img { max-width: 100%; height: auto; }
   margin-bottom: 8px; letter-spacing: 0.5px;
 }
 .case-card .case-header h3 { font-size: 16px; line-height: 1.5; }
-.case-card .case-body { padding: 28px 32px; }
-.case-card .case-body p { font-size: 14px; line-height: 1.75; color: var(--gray-600); }
+.case-card .case-body { padding: 28px 32px; flex: 1; display: flex; flex-direction: column; }
+.case-card .case-body p { font-size: 14px; line-height: 1.75; color: var(--gray-600); flex: 1; }
 .case-card .result {
   margin-top: 18px; padding: 14px 18px;
   background: linear-gradient(135deg, #ecfdf5, var(--sub-light));
