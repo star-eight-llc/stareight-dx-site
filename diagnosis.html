@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>無料DX診断 | スターエイト DXコンサルティング</title>
+<meta name="description" content="5分で御社のDXレベルを診断。7カテゴリ別のスコアと具体的な改善アクションがわかります。">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="star">★</span> StarEight <span class="dx-badge">DX</span></a>
+    <ul class="nav-links">
+      <li><a href="services.html">サービス</a></li>
+      <li><a href="diagnosis.html" class="active">無料DX診断</a></li>
+      <li><a href="cases.html">導入事例</a></li>
+      <li><a href="about.html">代表紹介</a></li>
+      <li><a href="contact.html" class="nav-cta">お問い合わせ</a></li>
+    </ul>
+    <button class="hamburger" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<section class="hero" style="padding:120px 0 60px;">
+  <div class="container">
+    <span class="tag" style="color:#fff;">FREE DIAGNOSIS</span>
+    <h1 style="color:#fff;font-size:32px;">無料DX診断</h1>
+    <p>30問の質問に答えるだけで（約5分）、御社のDXレベルを<br>7カテゴリ別に可視化し、具体的な改善アクションを提示します。</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width:700px;">
+    <div id="diagnosis-app">
+      <!-- Intro -->
+      <div id="diag-intro" class="fade-in">
+        <div style="text-align:center;margin-bottom:32px;">
+          <div style="font-size:64px;margin-bottom:16px;">📋</div>
+          <h2>DXセルフチェック（30問）</h2>
+          <p style="color:var(--gray-500);margin-top:8px;">各質問に「はい / 一部対応 / いいえ」で回答してください</p>
+        </div>
+        <div class="grid-2" style="margin-bottom:32px;">
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">⏱️</div>
+            <h3 style="font-size:15px;">所要時間</h3>
+            <p>約5分</p>
+          </div>
+          <div class="card" style="text-align:center;">
+            <div style="font-size:28px;margin-bottom:8px;">📊</div>
+            <h3 style="font-size:15px;">診断カテゴリ</h3>
+            <p>7カテゴリ・30問</p>
+          </div>
+        </div>
+        <div style="text-align:center;">
+          <button class="btn btn-primary" onclick="startDiagnosis()">診断を開始する →</button>
+        </div>
+      </div>
+
+      <!-- Questions -->
+      <div id="diag-questions" style="display:none;">
+        <div class="diag-progress"><div class="bar" id="progress-bar" style="width:0%"></div></div>
+        <div id="question-area"></div>
+        <div style="display:flex;gap:12px;margin-top:24px;">
+          <button class="btn btn-outline" id="prev-btn" onclick="prevQuestion()" style="display:none;">← 戻る</button>
+          <button class="btn btn-primary" id="next-btn" onclick="nextQuestion()">次へ →</button>
+        </div>
+      </div>
+
+      <!-- Results -->
+      <div id="diag-results" style="display:none;"></div>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <div class="footer-logo"><span class="star">★</span> StarEight DX</div>
+        <p>中小企業のDXを、わかりやすく。</p>
+      </div>
+      <div class="footer-links">
+        <h4>サービス</h4>
+        <ul><li><a href="services.html">サービス一覧</a></li><li><a href="cases.html">導入事例</a></li></ul>
+      </div>
+      <div class="footer-links">
+        <h4>会社情報</h4>
+        <ul><li><a href="about.html">代表紹介</a></li><li><a href="contact.html">お問い合わせ</a></li></ul>
+      </div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 StarEight LLC. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+var categories = [
+  {name:"業務プロセス",icon:"⚙️",questions:["日常業務の手順書・マニュアルが整備されている","紙の帳票や手書きの記録をデジタルに移行している","繰り返し作業の自動化（マクロ・ツール等）に取り組んでいる","業務フローを定期的に見直し改善している"]},
+  {name:"データ管理",icon:"💾",questions:["顧客情報をデータベースやCRMで一元管理している","売上・経費データを月次で正確に集計できている","データのバックアップを定期的に取っている","社内のデータに命名規則やフォルダ整理のルールがある"]},
+  {name:"データ活用",icon:"📊",questions:["経営判断にデータ（数値）を活用している","KPI（重要業績指標）を設定し定期的にモニタリングしている","顧客の購買傾向やリピート率を分析している","データを元にした改善施策を実行したことがある"]},
+  {name:"ITツール活用",icon:"🛠️",questions:["クラウドサービス（Google Workspace, Microsoft 365等）を業務で活用している","チャットツール（Slack, LINE WORKS等）で社内コミュニケーションしている","会計ソフトや勤怠管理ツールを導入している","オンライン会議ツールを日常的に使っている"]},
+  {name:"セキュリティ",icon:"🔒",questions:["パスワード管理のルールを定めている","ウイルス対策ソフトを全PCに導入している","個人情報の取り扱いルールを文書化している","社員へのセキュリティ教育を実施している"]},
+  {name:"AI活用",icon:"🤖",questions:["ChatGPT等の生成AIを業務で使ったことがある","AIを使った業務効率化に興味がある","AI導入の予算を確保する意思がある","AIに関する情報を定期的に収集している"]},
+  {name:"DX推進体制",icon:"🏢",questions:["経営者自身がDXの重要性を理解している","DX推進の担当者または責任者がいる","IT・DXに関する年間予算を設定している","外部のIT専門家と相談できる関係がある","社員のITスキル向上のための研修・教育機会がある","DXのロードマップ（中長期計画）を策定している"]}
+];
+
+var allQuestions = [];
+var currentQ = 0;
+var answers = [];
+
+categories.forEach(function(cat, ci) {
+  cat.questions.forEach(function(q, qi) {
+    allQuestions.push({category: ci, text: q, catName: cat.name, icon: cat.icon});
+  });
+});
+
+function startDiagnosis() {
+  document.getElementById('diag-intro').style.display = 'none';
+  document.getElementById('diag-questions').style.display = 'block';
+  answers = new Array(allQuestions.length).fill(-1);
+  currentQ = 0;
+  renderQuestion();
+}
+
+function renderQuestion() {
+  var q = allQuestions[currentQ];
+  var pct = Math.round((currentQ / allQuestions.length) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('prev-btn').style.display = currentQ > 0 ? '' : 'none';
+  document.getElementById('next-btn').textContent = currentQ === allQuestions.length - 1 ? '結果を見る →' : '次へ →';
+
+  var html = '<div class="diag-question">';
+  html += '<p style="font-size:12px;color:var(--blue);font-weight:600;margin-bottom:4px;">' + q.icon + ' ' + q.catName + '（' + (currentQ+1) + ' / ' + allQuestions.length + '）</p>';
+  html += '<h3>' + q.text + '</h3>';
+  html += '</div><div class="diag-options">';
+  var opts = [{val:2, label:'はい（対応済み）'},{val:1, label:'一部対応している'},{val:0, label:'いいえ（未対応）'}];
+  opts.forEach(function(o) {
+    var sel = answers[currentQ] === o.val ? ' selected' : '';
+    html += '<div class="diag-option' + sel + '" onclick="selectAnswer(' + o.val + ')">' + o.label + '</div>';
+  });
+  html += '</div>';
+  document.getElementById('question-area').innerHTML = html;
+}
+
+function selectAnswer(val) {
+  answers[currentQ] = val;
+  document.querySelectorAll('.diag-option').forEach(function(el) { el.classList.remove('selected'); });
+  event.target.classList.add('selected');
+}
+
+function nextQuestion() {
+  if (answers[currentQ] === -1) { alert('回答を選択してください'); return; }
+  if (currentQ < allQuestions.length - 1) { currentQ++; renderQuestion(); }
+  else { showResults(); }
+}
+
+function prevQuestion() {
+  if (currentQ > 0) { currentQ--; renderQuestion(); }
+}
+
+function showResults() {
+  document.getElementById('diag-questions').style.display = 'none';
+  document.getElementById('diag-results').style.display = 'block';
+
+  var catScores = categories.map(function(cat, ci) {
+    var qs = allQuestions.filter(function(q) { return q.category === ci; });
+    var idxs = [];
+    allQuestions.forEach(function(q, i) { if (q.category === ci) idxs.push(i); });
+    var total = 0;
+    idxs.forEach(function(i) { total += answers[i]; });
+    var maxScore = qs.length * 2;
+    return { name: cat.name, icon: cat.icon, score: total, max: maxScore, pct: Math.round((total / maxScore) * 100) };
+  });
+
+  var totalScore = 0, totalMax = 0;
+  catScores.forEach(function(c) { totalScore += c.score; totalMax += c.max; });
+  var totalPct = Math.round((totalScore / totalMax) * 100);
+
+  var level, levelColor, levelMsg;
+  if (totalPct >= 80) { level = 'A'; levelColor = '#2D8B57'; levelMsg = 'DX先進企業です。さらなる高度化を目指しましょう。'; }
+  else if (totalPct >= 60) { level = 'B'; levelColor = '#2E75B6'; levelMsg = '基礎は整っています。データ活用・AI導入で次のステージへ。'; }
+  else if (totalPct >= 40) { level = 'C'; levelColor = '#E67E22'; levelMsg = 'DXの入り口に立っています。まずは業務のデジタル化から。'; }
+  else { level = 'D'; levelColor = '#CC4444'; levelMsg = 'DXの第一歩を踏み出しましょう。無料DX診断で具体的な計画を。'; }
+
+  // Find weakest categories (TOP3 actions)
+  var sorted = catScores.slice().sort(function(a,b) { return a.pct - b.pct; });
+  var actions = {
+    "業務プロセス": "業務手順書の作成と、紙業務のデジタル移行から着手。Googleフォーム等の無料ツールで始められます。",
+    "データ管理": "まず顧客・売上データの一元管理を。Googleスプレッドシートでの管理テンプレートをご提供可能です。",
+    "データ活用": "月次KPI（売上・客数・客単価・リピート率）の可視化から。スターエイトの経営スコアカードがお役に立てます。",
+    "ITツール活用": "Google Workspace等のクラウドツール導入を推奨。初期設定・移行をサポートします。",
+    "セキュリティ": "パスワードポリシーの策定と、個人情報取扱いルールの文書化を最優先で。",
+    "AI活用": "まずはChatGPTで議事録作成やメール文面生成から試しましょう。業務別の活用ガイドを提供可能です。",
+    "DX推進体制": "DX推進の担当者を決め、年間予算を設定することが第一歩。スターエイトのDX顧問がサポートします。"
+  };
+
+  var html = '<div class="diag-result">';
+  html += '<h2>診断結果</h2>';
+  html += '<div class="score-circle" style="border-color:' + levelColor + ';">';
+  html += '<div class="score" style="color:' + levelColor + ';">' + totalPct + '</div>';
+  html += '<div class="max">/ 100点</div>';
+  html += '</div>';
+  html += '<div style="font-size:20px;font-weight:700;color:' + levelColor + ';margin-bottom:8px;">DXレベル：' + level + '</div>';
+  html += '<p style="color:var(--gray-500);margin-bottom:32px;">' + levelMsg + '</p>';
+
+  // Category bars
+  html += '<div style="text-align:left;margin-bottom:32px;">';
+  html += '<h3 style="font-size:18px;margin-bottom:16px;">カテゴリ別スコア</h3>';
+  catScores.forEach(function(c) {
+    var barColor = c.pct >= 60 ? '#2D8B57' : c.pct >= 40 ? '#E67E22' : '#CC4444';
+    html += '<div style="margin-bottom:12px;">';
+    html += '<div style="display:flex;justify-content:space-between;font-size:14px;margin-bottom:4px;">';
+    html += '<span>' + c.icon + ' ' + c.name + '</span><span style="font-weight:700;color:' + barColor + ';">' + c.pct + '点</span></div>';
+    html += '<div style="width:100%;height:8px;background:var(--gray-200);border-radius:4px;overflow:hidden;">';
+    html += '<div style="width:' + c.pct + '%;height:100%;background:' + barColor + ';border-radius:4px;transition:width 1s;"></div>';
+    html += '</div></div>';
+  });
+  html += '</div>';
+
+  // TOP3 Actions
+  html += '<div style="text-align:left;margin-bottom:32px;">';
+  html += '<h3 style="font-size:18px;margin-bottom:16px;">まず取り組むべきDXアクション TOP3</h3>';
+  for (var i = 0; i < 3 && i < sorted.length; i++) {
+    html += '<div class="card" style="margin-bottom:12px;border-left:4px solid var(--blue);">';
+    html += '<div style="font-size:12px;color:var(--blue);font-weight:700;margin-bottom:4px;">ACTION ' + (i+1) + '：' + sorted[i].icon + ' ' + sorted[i].name + '（現在 ' + sorted[i].pct + '点）</div>';
+    html += '<p style="font-size:14px;">' + (actions[sorted[i].name] || '') + '</p>';
+    html += '</div>';
+  }
+  html += '</div>';
+
+  // CTA
+  html += '<div class="cta-banner">';
+  html += '<h2 style="font-size:22px;">この診断結果をもとに、具体的な改善プランを無料でご提案します</h2>';
+  html += '<p>スターエイトのDXコンサルタントが、御社の状況に合わせた改善計画を策定します。</p>';
+  html += '<div class="btn-group" style="justify-content:center;">';
+  html += '<a href="contact.html" class="btn btn-white">無料相談を予約する →</a>';
+  html += '<a href="services.html" class="btn btn-ghost">サービスを見る</a>';
+  html += '</div></div>';
+
+  html += '</div>';
+  document.getElementById('diag-results').innerHTML = html;
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>

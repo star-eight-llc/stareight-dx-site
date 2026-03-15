@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>お問い合わせ | スターエイト DXコンサルティング</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="star">★</span> StarEight <span class="dx-badge">DX</span></a>
+    <ul class="nav-links">
+      <li><a href="services.html">サービス</a></li>
+      <li><a href="diagnosis.html">無料DX診断</a></li>
+      <li><a href="cases.html">導入事例</a></li>
+      <li><a href="about.html">代表紹介</a></li>
+      <li><a href="contact.html" class="nav-cta active">お問い合わせ</a></li>
+    </ul>
+    <button class="hamburger" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<section class="hero" style="padding:120px 0 60px;">
+  <div class="container">
+    <span class="tag" style="color:#fff;">CONTACT</span>
+    <h1 style="color:#fff;font-size:32px;">お問い合わせ</h1>
+    <p>無料DX診断のお申し込み、サービスに関するご質問など、<br>お気軽にお問い合わせください。</p>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container" style="max-width:700px;">
+    <div class="grid-2 fade-in" style="margin-bottom:40px;">
+      <div class="card" style="text-align:center;">
+        <div style="font-size:32px;margin-bottom:8px;">📧</div>
+        <h3 style="font-size:15px;">メール</h3>
+        <p><a href="/cdn-cgi/l/email-protection#70030411025e15191718045e1c1c1330171d11191c5e131f1d"><span class="__cf_email__" data-cfemail="40333421326e25292728346e2c2c2300272d21292c6e232f2d">[email&#160;protected]</span></a></p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div style="font-size:32px;margin-bottom:8px;">📋</div>
+        <h3 style="font-size:15px;">無料DX診断</h3>
+        <p><a href="diagnosis.html">オンラインで今すぐ診断 →</a></p>
+      </div>
+    </div>
+
+    <div class="fade-in">
+      <h2 style="font-size:22px;margin-bottom:24px;">お問い合わせフォーム</h2>
+      <!-- Replace YOUR_FORM_ID with actual Formspree ID -->
+      <form action="https://formspree.io/f/YOUR_FORM_ID" method="POST">
+        <div class="form-group">
+          <label>お名前 <span style="color:#CC4444;font-size:12px;">必須</span></label>
+          <input type="text" name="name" required placeholder="例：山田 太郎">
+        </div>
+        <div class="form-group">
+          <label>会社名</label>
+          <input type="text" name="company" placeholder="例：株式会社〇〇">
+        </div>
+        <div class="form-group">
+          <label>メールアドレス <span style="color:#CC4444;font-size:12px;">必須</span></label>
+          <input type="email" name="email" required placeholder="例：info@example.com">
+        </div>
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="tel" name="phone" placeholder="例：03-1234-5678">
+        </div>
+        <div class="form-group">
+          <label>お問い合わせ種別</label>
+          <select name="type">
+            <option value="">選択してください</option>
+            <option value="無料DX診断の申込み">無料DX診断の申込み</option>
+            <option value="サービスについての質問">サービスについての質問</option>
+            <option value="DX顧問の相談">DX顧問の相談</option>
+            <option value="見積もり依頼">見積もり依頼</option>
+            <option value="その他">その他</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>従業員数</label>
+          <select name="employees">
+            <option value="">選択してください</option>
+            <option value="1-5名">1〜5名</option>
+            <option value="6-10名">6〜10名</option>
+            <option value="11-30名">11〜30名</option>
+            <option value="31-50名">31〜50名</option>
+            <option value="51名以上">51名以上</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>お問い合わせ内容 <span style="color:#CC4444;font-size:12px;">必須</span></label>
+          <textarea name="message" required placeholder="ご質問やご相談の内容をご記入ください。&#10;例：Excelの業務が属人化しており、改善したいと考えています。"></textarea>
+        </div>
+        <div style="margin-top:8px;">
+          <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">送信する →</button>
+        </div>
+        <p style="font-size:12px;color:var(--gray-500);margin-top:12px;text-align:center;">
+          ※ 通常1営業日以内にご返信いたします。
+        </p>
+      </form>
+    </div>
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand"><div class="footer-logo"><span class="star">★</span> StarEight DX</div><p>中小企業のDXを、わかりやすく。</p></div>
+      <div class="footer-links"><h4>サービス</h4><ul><li><a href="services.html">サービス一覧</a></li><li><a href="diagnosis.html">無料DX診断</a></li></ul></div>
+      <div class="footer-links"><h4>会社情報</h4><ul><li><a href="about.html">代表紹介</a></li><li><a href="contact.html">お問い合わせ</a></li></ul></div>
+    </div>
+    <div c
