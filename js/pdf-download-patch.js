@@ -1,6 +1,5 @@
 // ============================================================
-// DX診断結果 PDFダウンロード機能 v6
-// ゆったりレイアウト版
+// DX診断結果 PDFダウンロード + 無料相談連携 v7
 // ============================================================
 (function() {
   'use strict';
@@ -40,10 +39,45 @@
       totalPct: totalPct, level: level, levelMsg: levelMsg,
       catScores: catScores, sorted: sorted, actionTexts: actionTexts
     };
+
+    // --- 元の showResults を実行 ---
     _orig.apply(this, arguments);
+
+    // --- CTA の「無料相談を予約する」リンクに診断データを付与 ---
+    rewriteCtaLink();
+
+    // --- PDFボタンを追加 ---
     injectPdfButton();
   };
 
+  // ====== CTA リンク書き換え ======
+  function rewriteCtaLink() {
+    var results = document.getElementById('diag-results');
+    if (!results || !_resultData) return;
+
+    // 診断データをURLパラメータ化
+    var d = _resultData;
+    var params = new URLSearchParams();
+    params.set('from', 'diagnosis');
+    params.set('score', d.totalPct);
+    params.set('level', d.level);
+    // カテゴリ別スコアをCSV形式で
+    var catData = d.catScores.map(function(c) { return c.name + ':' + c.pct; }).join(',');
+    params.set('cats', catData);
+    // TOP3
+    var top3 = d.sorted.slice(0, 3).map(function(c) { return c.name; }).join(',');
+    params.set('top3', top3);
+
+    var contactUrl = 'contact.html?' + params.toString();
+
+    // CTA内のcontact.htmlリンクを書き換え
+    var links = results.querySelectorAll('a[href="contact.html"]');
+    links.forEach(function(a) {
+      a.href = contactUrl;
+    });
+  }
+
+  // ====== PDFボタン ======
   function injectPdfButton() {
     var results = document.getElementById('diag-results');
     if (!results || document.getElementById('pdfDownloadBtn')) return;
@@ -69,6 +103,7 @@
     else results.appendChild(container);
   }
 
+  // ====== jsPDF動的ロード ======
   function loadJsPdf(callback) {
     if (_jspdfLoaded && window.jspdf) { callback(); return; }
     var urls = [
@@ -76,7 +111,7 @@
       'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js'
     ];
     function tryLoad(idx) {
-      if (idx >= urls.length) { callback(new Error('jsPDFの読み込みに失敗しました。インターネット接続を確認してください。')); return; }
+      if (idx >= urls.length) { callback(new Error('jsPDFの読み込みに失敗しました。')); return; }
       var s = document.createElement('script');
       s.src = urls[idx];
       s.onload = function() { if (window.jspdf) { _jspdfLoaded = true; callback(); } else { tryLoad(idx + 1); } };
@@ -91,9 +126,7 @@
     if (!_resultData) return;
     var btn = document.getElementById('pdfDownloadBtn');
     var origHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.style.opacity = '0.7';
-    btn.innerHTML = 'ライブラリ読み込み中...';
+    btn.disabled = true; btn.style.opacity = '0.7'; btn.innerHTML = 'ライブラリ読み込み中...';
     loadJsPdf(function(err) {
       if (err) { alert(err.message); btn.innerHTML = origHTML; btn.style.opacity = '1'; btn.disabled = false; return; }
       btn.innerHTML = 'PDF生成中...';
@@ -101,14 +134,13 @@
     });
   }
 
+  // ====== PDF生成（Canvas描画） ======
   function generatePdf(btn, origHTML) {
     try {
       var data = _resultData;
       var d = new Date();
-      var ds = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
-
-      var W = 840;
-      var DPR = 2;
+      var ds = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
+      var W = 840, DPR = 2;
       var canvas = document.createElement('canvas');
       canvas.width = W * DPR;
       var ctx = canvas.getContext('2d');
@@ -125,278 +157,137 @@
       var contentW = pw - margin * 2;
       var imgData = canvas.toDataURL('image/png');
       var imgH = (canvas.height / canvas.width) * contentW;
-
       if (imgH <= ph - margin * 2) {
         pdf.addImage(imgData, 'PNG', margin, margin, contentW, imgH);
       } else {
         var srcY = 0, pageNum = 0;
         while (srcY < canvas.height) {
           if (pageNum > 0) pdf.addPage();
-          var availH = ph - margin * 2;
-          var slicePx = (availH / contentW) * canvas.width;
-          slicePx = Math.min(slicePx, canvas.height - srcY);
+          var slicePx = Math.min(((ph - margin * 2) / contentW) * canvas.width, canvas.height - srcY);
           var sc = document.createElement('canvas');
-          sc.width = canvas.width;
-          sc.height = slicePx;
+          sc.width = canvas.width; sc.height = slicePx;
           sc.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, slicePx, 0, 0, sc.width, sc.height);
           pdf.addImage(sc.toDataURL('image/png'), 'PNG', margin, margin, contentW, (slicePx / canvas.width) * contentW);
-          srcY += slicePx;
-          pageNum++;
+          srcY += slicePx; pageNum++;
         }
       }
-
       var pages = pdf.internal.getNumberOfPages();
       for (var p = 1; p <= pages; p++) {
-        pdf.setPage(p);
-        pdf.setFontSize(7);
-        pdf.setTextColor(160, 160, 160);
-        pdf.text('StarEight LLC | https://stareight-dx-site.pages.dev', pw / 2, ph - 4, { align: 'center' });
-        pdf.text(p + '/' + pages, pw - margin, ph - 4, { align: 'right' });
+        pdf.setPage(p); pdf.setFontSize(7); pdf.setTextColor(160, 160, 160);
+        pdf.text('StarEight LLC | https://stareight-dx-site.pages.dev', pw/2, ph-4, {align:'center'});
+        pdf.text(p + '/' + pages, pw - margin, ph-4, {align:'right'});
       }
-
-      pdf.save('DX_Diagnosis_' + ds.replace(/\//g, '') + '.pdf');
-
+      pdf.save('DX_Diagnosis_' + ds.replace(/\//g,'') + '.pdf');
       btn.innerHTML = '✓ ダウンロード完了！';
-      btn.style.background = 'linear-gradient(135deg,#27ae60 0%,#2ecc71 100%)';
-      btn.style.opacity = '1';
+      btn.style.background = 'linear-gradient(135deg,#27ae60 0%,#2ecc71 100%)'; btn.style.opacity = '1';
       setTimeout(function() { btn.innerHTML = origHTML; btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)'; btn.disabled = false; }, 2500);
-
     } catch (err) {
-      console.error('PDF generation error:', err);
-      alert('PDF生成エラー: ' + err.message);
-      btn.innerHTML = origHTML;
-      btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)';
-      btn.style.opacity = '1';
-      btn.disabled = false;
+      console.error('PDF error:', err); alert('PDF生成エラー: ' + err.message);
+      btn.innerHTML = origHTML; btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)'; btn.style.opacity = '1'; btn.disabled = false;
     }
   }
 
   // ====== Canvas描画 ======
   function drawContent(ctx, W, data, dateStr, dryRun) {
     var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
-    var PAD = 50;
-    var CW = W - PAD * 2;
-    var y = 0;
+    var PAD = 50, CW = W - PAD * 2, y = 0;
 
-    // ===== ヘッダー帯 =====
+    // ヘッダー
     var headerH = 90;
     if (!dryRun) {
-      ctx.fillStyle = '#1a5276';
-      ctx.fillRect(0, 0, W, headerH);
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 15px ' + FONT;
-      ctx.fillText('★ StarEight DX Consulting', PAD, 35);
-      ctx.font = 'bold 26px ' + FONT;
-      ctx.fillText('DX診断レポート', PAD, 65);
-      ctx.font = '13px ' + FONT;
-      ctx.textAlign = 'right';
-      ctx.fillText('診断日：' + dateStr, W - PAD, 65);
-      ctx.textAlign = 'left';
+      ctx.fillStyle = '#1a5276'; ctx.fillRect(0, 0, W, headerH);
+      ctx.fillStyle = '#ffffff'; ctx.font = 'bold 15px ' + FONT; ctx.fillText('★ StarEight DX Consulting', PAD, 35);
+      ctx.font = 'bold 26px ' + FONT; ctx.fillText('DX診断レポート', PAD, 65);
+      ctx.font = '13px ' + FONT; ctx.textAlign = 'right'; ctx.fillText('診断日：' + dateStr, W - PAD, 65); ctx.textAlign = 'left';
     }
     y = headerH + 40;
 
-    // ===== 総合スコア =====
-    var cx = W / 2;
-    var lc = getLevelHex(data.level);
-    var circleR = 62;
+    // スコア円
+    var cx = W / 2, lc = getLevelHex(data.level), circleR = 62;
     if (!dryRun) {
-      // 背景の薄い円
-      ctx.beginPath();
-      ctx.arc(cx, y + circleR, circleR + 4, 0, Math.PI * 2);
-      ctx.fillStyle = '#f5f5f5';
-      ctx.fill();
-      // メイン円
-      ctx.beginPath();
-      ctx.arc(cx, y + circleR, circleR, 0, Math.PI * 2);
-      ctx.strokeStyle = lc;
-      ctx.lineWidth = 6;
-      ctx.stroke();
-      // スコア数値
-      ctx.fillStyle = lc;
-      ctx.font = 'bold 56px ' + FONT;
-      ctx.textAlign = 'center';
-      ctx.fillText(String(data.totalPct), cx, y + circleR + 12);
-      ctx.fillStyle = '#999999';
-      ctx.font = '15px ' + FONT;
-      ctx.fillText('/ 100点', cx, y + circleR + 34);
+      ctx.beginPath(); ctx.arc(cx, y + circleR, circleR + 4, 0, Math.PI * 2); ctx.fillStyle = '#f5f5f5'; ctx.fill();
+      ctx.beginPath(); ctx.arc(cx, y + circleR, circleR, 0, Math.PI * 2); ctx.strokeStyle = lc; ctx.lineWidth = 6; ctx.stroke();
+      ctx.fillStyle = lc; ctx.font = 'bold 56px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(String(data.totalPct), cx, y + circleR + 12);
+      ctx.fillStyle = '#999'; ctx.font = '15px ' + FONT; ctx.fillText('/ 100点', cx, y + circleR + 34);
     }
     y += circleR * 2 + 30;
-
-    // DXレベル
-    if (!dryRun) {
-      ctx.fillStyle = lc;
-      ctx.font = 'bold 26px ' + FONT;
-      ctx.textAlign = 'center';
-      ctx.fillText('DXレベル：' + data.level, cx, y);
-    }
+    if (!dryRun) { ctx.fillStyle = lc; ctx.font = 'bold 26px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('DXレベル：' + data.level, cx, y); }
     y += 22;
-    if (!dryRun) {
-      ctx.fillStyle = '#777777';
-      ctx.font = '15px ' + FONT;
-      ctx.textAlign = 'center';
-      ctx.fillText(data.levelMsg, cx, y);
-      ctx.textAlign = 'left';
-    }
+    if (!dryRun) { ctx.fillStyle = '#777'; ctx.font = '15px ' + FONT; ctx.textAlign = 'center'; ctx.fillText(data.levelMsg, cx, y); ctx.textAlign = 'left'; }
     y += 50;
 
-    // ===== カテゴリ別スコア =====
+    // カテゴリ別スコア
     if (!dryRun) {
-      ctx.fillStyle = '#1a5276';
-      ctx.font = 'bold 20px ' + FONT;
-      ctx.fillText('カテゴリ別スコア', PAD, y);
-      // 下線
-      ctx.fillStyle = '#2980b9';
-      ctx.fillRect(PAD, y + 6, 160, 3);
+      ctx.fillStyle = '#1a5276'; ctx.font = 'bold 20px ' + FONT; ctx.fillText('カテゴリ別スコア', PAD, y);
+      ctx.fillStyle = '#2980b9'; ctx.fillRect(PAD, y + 6, 160, 3);
     }
     y += 30;
-
     data.catScores.forEach(function(c) {
       var bc = getBarHex(c.pct);
       if (!dryRun) {
-        // カテゴリ名
-        ctx.fillStyle = '#333333';
-        ctx.font = '15px ' + FONT;
-        ctx.textAlign = 'left';
-        ctx.fillText(c.icon + '  ' + c.name, PAD, y);
-        // スコア
-        ctx.fillStyle = bc;
-        ctx.font = 'bold 16px ' + FONT;
-        ctx.textAlign = 'right';
-        ctx.fillText(c.pct + '点', W - PAD, y);
-        ctx.textAlign = 'left';
+        ctx.fillStyle = '#333'; ctx.font = '15px ' + FONT; ctx.textAlign = 'left'; ctx.fillText(c.icon + '  ' + c.name, PAD, y);
+        ctx.fillStyle = bc; ctx.font = 'bold 16px ' + FONT; ctx.textAlign = 'right'; ctx.fillText(c.pct + '点', W - PAD, y); ctx.textAlign = 'left';
       }
       y += 10;
       if (!dryRun) {
-        // バー背景
-        ctx.fillStyle = '#eeeeee';
-        roundRect(ctx, PAD, y, CW, 10, 5); ctx.fill();
-        // バー実績
-        if (c.pct > 0) {
-          ctx.fillStyle = bc;
-          roundRect(ctx, PAD, y, Math.max(10, (c.pct / 100) * CW), 10, 5); ctx.fill();
-        }
+        ctx.fillStyle = '#eee'; roundRect(ctx, PAD, y, CW, 10, 5); ctx.fill();
+        if (c.pct > 0) { ctx.fillStyle = bc; roundRect(ctx, PAD, y, Math.max(10, (c.pct / 100) * CW), 10, 5); ctx.fill(); }
       }
       y += 30;
     });
-
     y += 20;
 
-    // ===== TOP3 アクション =====
+    // TOP3
     if (!dryRun) {
-      ctx.fillStyle = '#1a5276';
-      ctx.font = 'bold 20px ' + FONT;
-      ctx.fillText('まず取り組むべきDXアクション TOP3', PAD, y);
-      ctx.fillStyle = '#2980b9';
-      ctx.fillRect(PAD, y + 6, 320, 3);
+      ctx.fillStyle = '#1a5276'; ctx.font = 'bold 20px ' + FONT; ctx.fillText('まず取り組むべきDXアクション TOP3', PAD, y);
+      ctx.fillStyle = '#2980b9'; ctx.fillRect(PAD, y + 6, 320, 3);
     }
     y += 32;
-
     for (var i = 0; i < 3 && i < data.sorted.length; i++) {
       var cat = data.sorted[i];
       var actionText = data.actionTexts[cat.name] || '';
-
-      // カード背景
       var cardFont = '14px ' + FONT;
       var lines = wrapText(ctx, actionText, CW - 60, cardFont);
       var cardH = 38 + lines.length * 20 + 16;
-
       if (!dryRun) {
-        // カード
-        ctx.fillStyle = '#f8fafb';
-        roundRect(ctx, PAD, y, CW, cardH, 8); ctx.fill();
-        ctx.strokeStyle = '#e0e8ef';
-        ctx.lineWidth = 1;
-        roundRect(ctx, PAD, y, CW, cardH, 8); ctx.stroke();
-        // 左側の色バー
-        ctx.fillStyle = '#2980b9';
-        ctx.fillRect(PAD, y + 8, 4, cardH - 16);
+        ctx.fillStyle = '#f8fafb'; roundRect(ctx, PAD, y, CW, cardH, 8); ctx.fill();
+        ctx.strokeStyle = '#e0e8ef'; ctx.lineWidth = 1; roundRect(ctx, PAD, y, CW, cardH, 8); ctx.stroke();
+        ctx.fillStyle = '#2980b9'; ctx.fillRect(PAD, y + 8, 4, cardH - 16);
       }
-
-      var innerX = PAD + 20;
-      var innerY = y + 24;
-
-      if (!dryRun) {
-        // ACTION番号 + カテゴリ名
-        ctx.fillStyle = '#2980b9';
-        ctx.font = 'bold 14px ' + FONT;
-        ctx.fillText('ACTION ' + (i + 1) + '：' + cat.icon + ' ' + cat.name + '（現在 ' + cat.pct + '点）', innerX, innerY);
-      }
-      innerY += 22;
-
-      if (!dryRun) {
-        ctx.fillStyle = '#555555';
-        ctx.font = cardFont;
-        lines.forEach(function(line) {
-          ctx.fillText(line, innerX, innerY);
-          innerY += 20;
-        });
-      }
-
+      var ix = PAD + 20, iy = y + 24;
+      if (!dryRun) { ctx.fillStyle = '#2980b9'; ctx.font = 'bold 14px ' + FONT; ctx.fillText('ACTION ' + (i+1) + '：' + cat.icon + ' ' + cat.name + '（現在 ' + cat.pct + '点）', ix, iy); }
+      iy += 22;
+      if (!dryRun) { ctx.fillStyle = '#555'; ctx.font = cardFont; lines.forEach(function(l) { ctx.fillText(l, ix, iy); iy += 20; }); }
       y += cardH + 14;
     }
-
     y += 30;
 
-    // ===== CTA帯 =====
-    var ctaH = 80;
+    // CTA帯
     if (!dryRun) {
-      ctx.fillStyle = '#1a5276';
-      roundRect(ctx, PAD, y, CW, ctaH, 10); ctx.fill();
-      ctx.fillStyle = '#ffffff';
-      ctx.font = 'bold 17px ' + FONT;
-      ctx.textAlign = 'center';
+      ctx.fillStyle = '#1a5276'; roundRect(ctx, PAD, y, CW, 80, 10); ctx.fill();
+      ctx.fillStyle = '#fff'; ctx.font = 'bold 17px ' + FONT; ctx.textAlign = 'center';
       ctx.fillText('この診断結果をもとに、具体的な改善プランを無料でご提案します', cx, y + 32);
-      ctx.font = '13px ' + FONT;
-      ctx.fillStyle = '#b0d4f1';
+      ctx.fillStyle = '#b0d4f1'; ctx.font = '13px ' + FONT;
       ctx.fillText('スターエイトのDXコンサルタントが、御社の状況に合わせた改善計画を策定します。', cx, y + 54);
-      ctx.font = '12px ' + FONT;
-      ctx.fillStyle = '#ffffff';
-      ctx.fillText('https://stareight-dx-site.pages.dev/contact.html', cx, y + 72);
-      ctx.textAlign = 'left';
+      ctx.fillStyle = '#fff'; ctx.font = '12px ' + FONT;
+      ctx.fillText('https://stareight-dx-site.pages.dev/contact.html', cx, y + 72); ctx.textAlign = 'left';
     }
-    y += ctaH + 30;
-
-    // フッター
-    if (!dryRun) {
-      ctx.fillStyle = '#bbbbbb';
-      ctx.font = '11px ' + FONT;
-      ctx.textAlign = 'center';
-      ctx.fillText('© 2026 StarEight LLC. All rights reserved.', cx, y);
-      ctx.textAlign = 'left';
-    }
+    y += 110;
+    if (!dryRun) { ctx.fillStyle = '#bbb'; ctx.font = '11px ' + FONT; ctx.textAlign = 'center'; ctx.fillText('© 2026 StarEight LLC. All rights reserved.', cx, y); ctx.textAlign = 'left'; }
     y += 30;
-
     return y;
   }
 
-  // ユーティリティ
   function wrapText(ctx, text, maxW, font) {
-    ctx.font = font;
-    var lines = [], cur = '';
-    for (var i = 0; i < text.length; i++) {
-      var test = cur + text[i];
-      if (ctx.measureText(test).width > maxW && cur.length > 0) { lines.push(cur); cur = text[i]; }
-      else { cur = test; }
-    }
-    if (cur) lines.push(cur);
-    return lines;
+    ctx.font = font; var lines = [], cur = '';
+    for (var i = 0; i < text.length; i++) { var t = cur + text[i]; if (ctx.measureText(t).width > maxW && cur.length > 0) { lines.push(cur); cur = text[i]; } else { cur = t; } }
+    if (cur) lines.push(cur); return lines;
   }
-
   function roundRect(ctx, x, y, w, h, r) {
-    ctx.beginPath();
-    ctx.moveTo(x + r, y);
-    ctx.lineTo(x + w - r, y);
-    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
-    ctx.lineTo(x + w, y + h - r);
-    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
-    ctx.lineTo(x + r, y + h);
-    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
-    ctx.lineTo(x, y + r);
-    ctx.quadraticCurveTo(x, y, x + r, y);
-    ctx.closePath();
+    ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y); ctx.quadraticCurveTo(x+w,y,x+w,y+r);
+    ctx.lineTo(x+w,y+h-r); ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+    ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r); ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
   }
-
-  function getLevelHex(l) { return l === 'A' ? '#2D8B57' : l === 'B' ? '#2E75B6' : l === 'C' ? '#E67E22' : '#CC4444'; }
-  function getBarHex(p) { return p >= 60 ? '#2D8B57' : p >= 40 ? '#E67E22' : '#CC4444'; }
-
+  function getLevelHex(l) { return l==='A'?'#2D8B57':l==='B'?'#2E75B6':l==='C'?'#E67E22':'#CC4444'; }
+  function getBarHex(p) { return p>=60?'#2D8B57':p>=40?'#E67E22':'#CC4444'; }
 })();
