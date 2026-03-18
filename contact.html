@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>お問い合わせ | スターエイト DXコンサルティング</title>
+<title>無料相談・お問い合わせ | スターエイト DXコンサルティング</title>
+<meta name="description" content="DXの無料相談・お問い合わせはこちら。30分のオンライン面談で、御社のDX課題を整理します。">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
@@ -24,50 +25,45 @@
 <section class="hero" style="padding:120px 0 60px;">
   <div class="container">
     <span class="tag" style="color:#5BC5AC;">CONTACT</span>
-    <h1 style="color:#fff;font-size:32px;">お問い合わせ</h1>
-    <p>無料DX診断のお申し込み、サービスに関するご質問など、<br>お気軽にお問い合わせください。</p>
+    <h1 style="color:#fff;font-size:32px;">無料相談・お問い合わせ</h1>
+    <p>まずはお気軽にご相談ください。<br>30分のオンライン面談で、御社のDXの方向性を一緒に整理します。</p>
   </div>
 </section>
 
 <section class="section">
   <div class="container" style="max-width:700px;">
-    <div class="grid-2 fade-in" style="margin-bottom:40px;">
-      <div class="card" style="text-align:center;">
-        <div style="font-size:32px;margin-bottom:8px;">📧</div>
-        <h3 style="font-size:15px;">メール</h3>
-        <p><a href="https://mail.google.com/mail/?view=cm&to=star.eight.llc%40gmail.com" target="_blank">star.eight.llc [at] gmail.com</a></p>
+
+    <!-- 診断結果バナー（診断から遷移した場合のみ表示） -->
+    <div id="diagResultBanner" style="display:none; margin-bottom:32px; padding:24px 28px; background:linear-gradient(135deg,#f0f7ff 0%,#e8f4f8 100%); border-radius:12px; border:1px solid #d0e3f0;">
+      <div style="display:flex; align-items:center; gap:8px; margin-bottom:12px;">
+        <span style="font-size:20px;">📊</span>
+        <h3 style="font-size:16px; margin:0; color:#1a5276;">DX診断結果をもとにご相談</h3>
       </div>
-      <div class="card" style="text-align:center;">
-        <div style="font-size:32px;margin-bottom:8px;">📋</div>
-        <h3 style="font-size:15px;">無料DX診断</h3>
-        <p><a href="diagnosis.html">オンラインで今すぐ診断 →</a></p>
+      <div id="diagSummary" style="display:flex; gap:16px; flex-wrap:wrap; margin-bottom:12px;"></div>
+      <p style="font-size:13px; color:#666; margin:0;">診断結果データはフォームに自動で添付されます。コンサルタントが内容を確認した上でご連絡します。</p>
+    </div>
+
+    <!-- 無料相談の特徴 -->
+    <div class="card" style="margin-bottom:32px; text-align:center; border:2px solid var(--blue); background:var(--blue-50, #f0f4ff);">
+      <div style="font-size:28px; margin-bottom:8px;">💬</div>
+      <h3 style="font-size:18px; margin-bottom:8px;">無料相談について</h3>
+      <div style="display:flex; gap:16px; justify-content:center; flex-wrap:wrap; font-size:14px; color:var(--gray-600);">
+        <span>⏱️ 約30分</span>
+        <span>💻 オンライン可</span>
+        <span>💰 完全無料</span>
+        <span>🤝 営業目的ではありません</span>
       </div>
     </div>
 
-    <div class="fade-in">
-      <h2 style="font-size:22px;margin-bottom:24px;">お問い合わせフォーム</h2>
-      <!-- Replace YOUR_FORM_ID with actual Formspree ID -->
-      <form action="https://formspree.io/f/mbdzaaaa" method="POST">
+    <!-- フォーム -->
+    <div class="card">
+      <form action="https://formspree.io/f/mbdzaaaa" method="POST" id="contactForm">
         <div class="form-group">
-          <label>お名前 <span style="color:#CC4444;font-size:12px;">必須</span></label>
-          <input type="text" name="name" required placeholder="例：山田 太郎">
-        </div>
-        <div class="form-group">
-          <label>会社名</label>
-          <input type="text" name="company" placeholder="例：株式会社〇〇">
-        </div>
-        <div class="form-group">
-          <label>メールアドレス <span style="color:#CC4444;font-size:12px;">必須</span></label>
-          <input type="email" name="email" required placeholder="例：info@example.com">
-        </div>
-        <div class="form-group">
-          <label>電話番号</label>
-          <input type="tel" name="phone" placeholder="例：03-1234-5678">
-        </div>
-        <div class="form-group">
-          <label>お問い合わせ種別</label>
-          <select name="type">
+          <label>お問い合わせ種別 <span style="color:#CC4444;">*</span></label>
+          <select name="type" id="formType" required>
             <option value="">選択してください</option>
+            <option value="DX診断結果をもとに無料相談">📊 DX診断結果をもとに無料相談</option>
+            <option value="無料相談の申込み">★ 無料相談の申込み（30分・オンライン可）</option>
             <option value="無料DX診断の申込み">無料DX診断の申込み</option>
             <option value="サービスについての質問">サービスについての質問</option>
             <option value="DX顧問の相談">DX顧問の相談</option>
@@ -75,21 +71,81 @@
             <option value="その他">その他</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label>従業員数</label>
-          <select name="employees">
+          <label>会社名・屋号 <span style="color:#CC4444;">*</span></label>
+          <input type="text" name="company" placeholder="例：株式会社○○" required>
+        </div>
+
+        <div class="form-group">
+          <label>お名前 <span style="color:#CC4444;">*</span></label>
+          <input type="text" name="name" placeholder="例：山田 太郎" required>
+        </div>
+
+        <div class="form-group">
+          <label>メールアドレス <span style="color:#CC4444;">*</span></label>
+          <input type="email" name="email" placeholder="例：info@example.com" required>
+        </div>
+
+        <div class="form-group">
+          <label>電話番号</label>
+          <input type="tel" name="phone" placeholder="例：03-1234-5678">
+        </div>
+
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+          <div class="form-group">
+            <label>業種</label>
+            <select name="industry">
+              <option value="">選択してください</option>
+              <option value="製造業">製造業</option>
+              <option value="建設業">建設業</option>
+              <option value="小売・卸売業">小売・卸売業</option>
+              <option value="飲食・サービス業">飲食・サービス業</option>
+              <option value="美容・エステ">美容・エステ</option>
+              <option value="医療・福祉">医療・福祉</option>
+              <option value="不動産業">不動産業</option>
+              <option value="IT・通信業">IT・通信業</option>
+              <option value="士業・コンサルティング">士業・コンサルティング</option>
+              <option value="その他">その他</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>従業員数</label>
+            <select name="employees">
+              <option value="">選択してください</option>
+              <option value="1-5名">1〜5名</option>
+              <option value="6-10名">6〜10名</option>
+              <option value="11-30名">11〜30名</option>
+              <option value="31-50名">31〜50名</option>
+              <option value="51名以上">51名以上</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>DXへの年間予算感</label>
+          <select name="budget">
             <option value="">選択してください</option>
-            <option value="1-5名">1〜5名</option>
-            <option value="6-10名">6〜10名</option>
-            <option value="11-30名">11〜30名</option>
-            <option value="31-50名">31〜50名</option>
-            <option value="51名以上">51名以上</option>
+            <option value="まだ未定">まだ未定・これから検討</option>
+            <option value="~50万円">〜50万円</option>
+            <option value="50~100万円">50〜100万円</option>
+            <option value="100~300万円">100〜300万円</option>
+            <option value="300万円以上">300万円以上</option>
           </select>
         </div>
+
         <div class="form-group">
-          <label>お問い合わせ内容 <span style="color:#CC4444;font-size:12px;">必須</span></label>
-          <textarea name="message" required placeholder="ご質問やご相談の内容をご記入ください。&#10;例：Excelの業務が属人化しており、改善したいと考えています。"></textarea>
+          <label>お問い合わせ内容</label>
+          <textarea name="message" id="formMessage" rows="5" placeholder="ご質問やご相談の内容をご記入ください。&#10;無料相談の場合は、ご希望の日時や相談内容を簡単にお書きいただけると助かります。"></textarea>
         </div>
+
+        <!-- 診断結果の隠しフィールド -->
+        <input type="hidden" name="dx_score" id="hiddenScore" value="">
+        <input type="hidden" name="dx_level" id="hiddenLevel" value="">
+        <input type="hidden" name="dx_categories" id="hiddenCats" value="">
+        <input type="hidden" name="dx_top3" id="hiddenTop3" value="">
+
         <div style="margin-top:8px;">
           <button type="submit" class="btn btn-primary" style="width:100%;justify-content:center;">送信する →</button>
         </div>
@@ -98,14 +154,100 @@
         </p>
       </form>
     </div>
+
+    <!-- 連絡先情報 -->
+    <div style="text-align:center; margin-top:32px; color:var(--gray-500); font-size:14px;">
+      <p>メールでのお問い合わせ：<a href="mailto:star.eight.llc@gmail.com">star.eight.llc@gmail.com</a></p>
+    </div>
   </div>
 </section>
 
 <footer class="site-footer">
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-brand"><div class="footer-logo"><span class="star">★</span> StarEight DX</div><p>中小企業のDXを、わかりやすく。</p></div>
-      <div class="footer-links"><h4>サービス</h4><ul><li><a href="services.html">サービス一覧</a></li><li><a href="diagnosis.html">無料DX診断</a></li></ul></div>
-      <div class="footer-links"><h4>会社情報</h4><ul><li><a href="about.html">代表紹介</a></li><li><a href="contact.html">お問い合わせ</a></li></ul></div>
+      <div class="footer-brand">
+        <div class="footer-logo"><span class="star">★</span> StarEight DX</div>
+        <p>中小企業のDXを、わかりやすく。</p>
+      </div>
+      <div class="footer-links">
+        <h4>サービス</h4>
+        <ul><li><a href="services.html">サービス一覧</a></li><li><a href="cases.html">DX支援イメージ</a></li></ul>
+      </div>
+      <div class="footer-links">
+        <h4>ご相談</h4>
+        <ul><li><a href="contact.html">無料相談を予約</a></li><li><a href="about.html">代表紹介</a></li></ul>
+      </div>
     </div>
-    <div c
+    <div class="footer-bottom">&copy; 2026 StarEight LLC. All rights reserved.</div>
+  </div>
+</footer>
+
+<script src="js/main.js"></script>
+<script>
+// ====== 診断結果データの受け取りと自動セット ======
+(function() {
+  var params = new URLSearchParams(window.location.search);
+  var fromDiag = params.get('from') === 'diagnosis';
+
+  if (!fromDiag) return;
+
+  var score = params.get('score') || '';
+  var level = params.get('level') || '';
+  var cats  = params.get('cats') || '';
+  var top3  = params.get('top3') || '';
+
+  // 隠しフィールドにセット
+  document.getElementById('hiddenScore').value = score;
+  document.getElementById('hiddenLevel').value = level;
+  document.getElementById('hiddenCats').value = cats;
+  document.getElementById('hiddenTop3').value = top3;
+
+  // お問い合わせ種別を自動選択
+  document.getElementById('formType').value = 'DX診断結果をもとに無料相談';
+
+  // メッセージ欄にプリセット
+  var msgEl = document.getElementById('formMessage');
+  var presetMsg = '【DX診断結果をもとにご相談希望】\n' +
+    '総合スコア: ' + score + '点 / DXレベル: ' + level + '\n\n' +
+    'ご相談したい内容：\n';
+  msgEl.value = presetMsg;
+  // カーソルを末尾に
+  setTimeout(function() { msgEl.focus(); msgEl.setSelectionRange(presetMsg.length, presetMsg.length); }, 300);
+
+  // 診断結果バナーを表示
+  var banner = document.getElementById('diagResultBanner');
+  banner.style.display = 'block';
+
+  var summaryEl = document.getElementById('diagSummary');
+  var levelColors = { A: '#2D8B57', B: '#2E75B6', C: '#E67E22', D: '#CC4444' };
+  var lc = levelColors[level] || '#666';
+
+  // スコアバッジ
+  summaryEl.innerHTML =
+    '<div style="text-align:center; padding:12px 20px; background:#fff; border-radius:8px; min-width:100px;">' +
+      '<div style="font-size:28px; font-weight:bold; color:' + lc + ';">' + score + '<span style="font-size:14px;color:#999;"> / 100</span></div>' +
+      '<div style="font-size:12px; color:#888;">総合スコア</div>' +
+    '</div>' +
+    '<div style="text-align:center; padding:12px 20px; background:#fff; border-radius:8px; min-width:80px;">' +
+      '<div style="font-size:28px; font-weight:bold; color:' + lc + ';">Level ' + level + '</div>' +
+      '<div style="font-size:12px; color:#888;">DXレベル</div>' +
+    '</div>';
+
+  // TOP3をバッジ表示
+  if (top3) {
+    var top3Arr = top3.split(',');
+    var top3Html = '<div style="padding:12px 20px; background:#fff; border-radius:8px; flex:1;">' +
+      '<div style="font-size:12px; color:#888; margin-bottom:4px;">優先改善カテゴリ</div>';
+    top3Arr.forEach(function(name, i) {
+      top3Html += '<div style="font-size:13px; color:#1a5276; margin-bottom:2px;">' + (i+1) + '. ' + name + '</div>';
+    });
+    top3Html += '</div>';
+    summaryEl.innerHTML += top3Html;
+  }
+
+  // ページ上部にスムーズスクロール
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+})();
+</script>
+</body>
+</html>
