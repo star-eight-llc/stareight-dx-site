@@ -1,16 +1,16 @@
 // ============================================================
-// DX診断結果 PDFダウンロード機能 v3
-// html2canvas不要 — jsPDFのみで直接描画
+// DX診断結果 PDFダウンロード機能 v5
+// jsPDFを動的ロード＋Canvas自前描画（日本語完全対応）
 // diagnosis.html の </body> 直前で読み込む
 // ============================================================
 (function() {
   'use strict';
 
   var _resultData = null;
+  var _jspdfLoaded = false;
   var _orig = window.showResults;
 
   window.showResults = function() {
-    // 結果データを計算して保存
     var catScores = categories.map(function(cat, ci) {
       var idxs = [];
       allQuestions.forEach(function(q, i) { if (q.category === ci) idxs.push(i); });
@@ -25,12 +25,12 @@
     var totalPct = Math.round((totalScore / totalMax) * 100);
 
     var level, levelMsg;
-    if (totalPct >= 80) { level = 'A'; levelMsg = 'DX先進企業です。'; }
-    else if (totalPct >= 60) { level = 'B'; levelMsg = '基礎は整っています。'; }
-    else if (totalPct >= 40) { level = 'C'; levelMsg = 'DXの入り口に立っています。'; }
-    else { level = 'D'; levelMsg = 'DXの第一歩を踏み出しましょう。'; }
+    if (totalPct >= 80) { level = 'A'; levelMsg = 'DX先進企業です。さらなる高度化を目指しましょう。'; }
+    else if (totalPct >= 60) { level = 'B'; levelMsg = '基礎は整っています。データ活用・AI導入で次のステージへ。'; }
+    else if (totalPct >= 40) { level = 'C'; levelMsg = 'DXの入り口に立っています。まずは業務のデジタル化から。'; }
+    else { level = 'D'; levelMsg = 'DXの第一歩を踏み出しましょう。無料DX診断で具体的な計画を。'; }
 
-    var sorted = catScores.slice().sort(function(a,b) { return a.pct - b.pct; });
+    var sorted = catScores.slice().sort(function(a, b) { return a.pct - b.pct; });
 
     var actionTexts = {
       "業務プロセス": "業務手順書の作成と、紙業務のデジタル移行から着手。Googleフォーム等の無料ツールで始められます。",
@@ -43,12 +43,8 @@
     };
 
     _resultData = {
-      totalPct: totalPct,
-      level: level,
-      levelMsg: levelMsg,
-      catScores: catScores,
-      sorted: sorted,
-      actionTexts: actionTexts
+      totalPct: totalPct, level: level, levelMsg: levelMsg,
+      catScores: catScores, sorted: sorted, actionTexts: actionTexts
     };
 
     _orig.apply(this, arguments);
@@ -57,264 +53,384 @@
 
   function injectPdfButton() {
     var results = document.getElementById('diag-results');
-    if (!results) return;
-    if (document.getElementById('pdfDownloadBtn')) return;
+    if (!results || document.getElementById('pdfDownloadBtn')) return;
 
     var ctaBanner = results.querySelector('.cta-banner');
-
     var container = document.createElement('div');
     container.style.cssText = 'text-align:center; margin: 32px 0;';
     container.innerHTML =
       '<button id="pdfDownloadBtn" style="' +
-        'display:inline-flex;align-items:center;gap:8px;' +
-        'padding:14px 32px;' +
+        'display:inline-flex;align-items:center;gap:8px;padding:14px 32px;' +
         'background:linear-gradient(135deg,#1a5276 0%,#2980b9 100%);' +
-        'color:#fff;border:none;border-radius:8px;' +
-        'font-size:16px;font-weight:600;cursor:pointer;' +
-        'box-shadow:0 4px 14px rgba(26,82,118,0.3);' +
-        'transition:all 0.3s ease;">' +
+        'color:#fff;border:none;border-radius:8px;font-size:16px;font-weight:600;' +
+        'cursor:pointer;box-shadow:0 4px 14px rgba(26,82,118,0.3);transition:all 0.3s ease;">' +
         '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' +
           '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>' +
-          '<polyline points="7 10 12 15 17 10"/>' +
-          '<line x1="12" y1="15" x2="12" y2="3"/>' +
-        '</svg>' +
-        '診断結果をPDFでダウンロード' +
-      '</button>' +
+          '<polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>' +
+        '</svg>診断結果をPDFでダウンロード</button>' +
       '<p style="margin-top:8px;font-size:13px;color:#888;">保存して後から見返すことができます</p>';
 
     var btn = container.querySelector('button');
-    btn.addEventListener('mouseenter', function() {
-      this.style.transform = 'translateY(-2px)';
-      this.style.boxShadow = '0 6px 20px rgba(26,82,118,0.4)';
-    });
-    btn.addEventListener('mouseleave', function() {
-      this.style.transform = '';
-      this.style.boxShadow = '0 4px 14px rgba(26,82,118,0.3)';
-    });
-    btn.addEventListener('click', downloadPdf);
+    btn.onmouseenter = function() { this.style.transform = 'translateY(-2px)'; this.style.boxShadow = '0 6px 20px rgba(26,82,118,0.4)'; };
+    btn.onmouseleave = function() { this.style.transform = ''; this.style.boxShadow = '0 4px 14px rgba(26,82,118,0.3)'; };
+    btn.onclick = onClickPdf;
 
-    if (ctaBanner) {
-      ctaBanner.parentNode.insertBefore(container, ctaBanner);
-    } else {
-      results.appendChild(container);
-    }
+    if (ctaBanner) ctaBanner.parentNode.insertBefore(container, ctaBanner);
+    else results.appendChild(container);
   }
 
-  // --- PDF生成（jsPDFのみ） ---
-  function downloadPdf() {
-    if (!_resultData) { alert('診断データがありません'); return; }
+  // --- jsPDFを動的に読み込み ---
+  function loadJsPdf(callback) {
+    if (_jspdfLoaded && window.jspdf) { callback(); return; }
+
+    var urls = [
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js',
+      'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js'
+    ];
+
+    function tryLoad(idx) {
+      if (idx >= urls.length) {
+        callback(new Error('jsPDFの読み込みに失敗しました。インターネット接続を確認してください。'));
+        return;
+      }
+      var s = document.createElement('script');
+      s.src = urls[idx];
+      s.onload = function() {
+        if (window.jspdf) {
+          _jspdfLoaded = true;
+          callback();
+        } else {
+          tryLoad(idx + 1);
+        }
+      };
+      s.onerror = function() { tryLoad(idx + 1); };
+      document.head.appendChild(s);
+    }
+
+    // 既にグローバルにある場合
+    if (window.jspdf) { _jspdfLoaded = true; callback(); return; }
+    tryLoad(0);
+  }
+
+  // --- ボタンクリック ---
+  function onClickPdf() {
+    if (!_resultData) return;
 
     var btn = document.getElementById('pdfDownloadBtn');
-    var originalHTML = btn.innerHTML;
+    var origHTML = btn.innerHTML;
     btn.disabled = true;
     btn.style.opacity = '0.7';
-    btn.innerHTML = 'PDF生成中...';
+    btn.innerHTML = 'ライブラリ読み込み中...';
 
+    loadJsPdf(function(err) {
+      if (err) {
+        alert(err.message);
+        btn.innerHTML = origHTML;
+        btn.style.opacity = '1';
+        btn.disabled = false;
+        return;
+      }
+      btn.innerHTML = 'PDF生成中...';
+      // 少し待ってからPDF生成（UIを更新させるため）
+      setTimeout(function() { generatePdf(btn, origHTML); }, 50);
+    });
+  }
+
+  // --- PDF生成 ---
+  function generatePdf(btn, origHTML) {
     try {
-      var jsPDF = window.jspdf.jsPDF;
-      var pdf = new jsPDF('p', 'mm', 'a4');
-      var pw = 210, ph = 297, m = 20;
-      var cw = pw - m * 2;
-      var y = 0;
       var data = _resultData;
       var d = new Date();
-      var ds = d.getFullYear() + '/' +
-               String(d.getMonth()+1).padStart(2,'0') + '/' +
-               String(d.getDate()).padStart(2,'0');
+      var ds = d.getFullYear() + '/' + String(d.getMonth() + 1).padStart(2, '0') + '/' + String(d.getDate()).padStart(2, '0');
 
-      // ヘッダー帯
-      pdf.setFillColor(26, 82, 118);
-      pdf.rect(0, 0, pw, 44, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(12);
-      pdf.text('StarEight DX Consulting', m, 16);
-      pdf.setFontSize(18);
-      pdf.text('DX Diagnosis Report', m, 30);
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(10);
-      pdf.text(ds, pw - m, 36, {align:'right'});
+      // Canvas作成
+      var W = 800;
+      var DPR = 2;
+      var canvas = document.createElement('canvas');
+      canvas.width = W * DPR;
+      var ctx = canvas.getContext('2d');
+      ctx.scale(DPR, DPR);
 
-      y = 56;
+      // 高さ計算（ドライラン）
+      var totalH = drawContent(ctx, W, data, ds, true);
+      canvas.height = totalH * DPR;
 
-      // 総合スコア円
-      var cx = pw / 2;
-      var lc = getLevelColor(data.level);
+      // リセットして本描画
+      ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, W, totalH);
+      drawContent(ctx, W, data, ds, false);
 
-      pdf.setDrawColor(lc.r, lc.g, lc.b);
-      pdf.setLineWidth(2.5);
-      pdf.circle(cx, y + 18, 18);
-      pdf.setTextColor(lc.r, lc.g, lc.b);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(32);
-      pdf.text(String(data.totalPct), cx, y + 20, {align:'center'});
-      pdf.setFontSize(10);
-      pdf.setTextColor(120, 120, 120);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text('/ 100', cx, y + 28, {align:'center'});
+      // jsPDFに変換
+      var pdf = new window.jspdf.jsPDF('p', 'mm', 'a4');
+      var pw = 210, ph = 297, margin = 10;
+      var contentW = pw - margin * 2;
+      var imgData = canvas.toDataURL('image/png');
+      var imgH = (canvas.height / canvas.width) * contentW;
 
-      y += 42;
+      if (imgH <= ph - margin * 2) {
+        pdf.addImage(imgData, 'PNG', margin, margin, contentW, imgH);
+      } else {
+        var srcY = 0;
+        var pageNum = 0;
+        while (srcY < canvas.height) {
+          if (pageNum > 0) pdf.addPage();
+          var availH = ph - margin * 2;
+          var slicePx = (availH / contentW) * canvas.width;
+          slicePx = Math.min(slicePx, canvas.height - srcY);
 
-      // DXレベル
-      pdf.setTextColor(lc.r, lc.g, lc.b);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(16);
-      pdf.text('DX Level : ' + data.level, cx, y, {align:'center'});
-
-      y += 14;
-
-      // 区切り線
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.3);
-      pdf.line(m, y, pw - m, y);
-      y += 8;
-
-      // カテゴリ別スコア見出し
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(13);
-      pdf.text('Category Scores', m, y);
-      y += 10;
-
-      data.catScores.forEach(function(c) {
-        var bc = getBarColor(c.pct);
-
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(10);
-        pdf.setTextColor(60, 60, 60);
-        pdf.text(c.name, m, y);
-
-        pdf.setFont('helvetica', 'bold');
-        pdf.setTextColor(bc.r, bc.g, bc.b);
-        pdf.text(c.pct + '%', pw - m, y, {align:'right'});
-
-        y += 3;
-
-        // バー背景
-        pdf.setFillColor(230, 230, 230);
-        pdf.roundedRect(m, y, cw, 4, 2, 2, 'F');
-
-        // バー実績
-        if (c.pct > 0) {
-          var barW = Math.max(4, (c.pct / 100) * cw);
-          pdf.setFillColor(bc.r, bc.g, bc.b);
-          pdf.roundedRect(m, y, barW, 4, 2, 2, 'F');
+          var sc = document.createElement('canvas');
+          sc.width = canvas.width;
+          sc.height = slicePx;
+          sc.getContext('2d').drawImage(canvas, 0, srcY, canvas.width, slicePx, 0, 0, sc.width, sc.height);
+          var sH = (slicePx / canvas.width) * contentW;
+          pdf.addImage(sc.toDataURL('image/png'), 'PNG', margin, margin, contentW, sH);
+          srcY += slicePx;
+          pageNum++;
         }
-
-        y += 10;
-      });
-
-      y += 4;
-
-      // 区切り線
-      pdf.setDrawColor(200, 200, 200);
-      pdf.setLineWidth(0.3);
-      pdf.line(m, y, pw - m, y);
-      y += 8;
-
-      // TOP3アクション見出し
-      pdf.setTextColor(40, 40, 40);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(13);
-      pdf.text('Top 3 Priority Actions', m, y);
-      y += 10;
-
-      for (var i = 0; i < 3 && i < data.sorted.length; i++) {
-        var cat = data.sorted[i];
-        var actionText = data.actionTexts[cat.name] || '';
-
-        if (y > ph - 50) { pdf.addPage(); y = m; }
-
-        // 番号バッジ
-        pdf.setFillColor(41, 128, 185);
-        pdf.roundedRect(m, y - 4, 6, 6, 1, 1, 'F');
-        pdf.setTextColor(255, 255, 255);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(8);
-        pdf.text(String(i + 1), m + 3, y, {align:'center'});
-
-        // カテゴリ名
-        pdf.setTextColor(41, 128, 185);
-        pdf.setFont('helvetica', 'bold');
-        pdf.setFontSize(10);
-        pdf.text(cat.name + '  (' + cat.pct + '%)', m + 9, y);
-        y += 6;
-
-        // 説明テキスト（折り返し）
-        pdf.setTextColor(80, 80, 80);
-        pdf.setFont('helvetica', 'normal');
-        pdf.setFontSize(9);
-        var lines = pdf.splitTextToSize(actionText, cw - 10);
-        pdf.text(lines, m + 9, y);
-        y += lines.length * 4.5 + 8;
       }
 
-      // CTA帯
-      y += 8;
-      if (y > ph - 40) { pdf.addPage(); y = m; }
-
-      pdf.setFillColor(26, 82, 118);
-      pdf.roundedRect(m, y, cw, 28, 3, 3, 'F');
-      pdf.setTextColor(255, 255, 255);
-      pdf.setFont('helvetica', 'bold');
-      pdf.setFontSize(11);
-      pdf.text('Free Consultation Available', pw / 2, y + 12, {align:'center'});
-      pdf.setFont('helvetica', 'normal');
-      pdf.setFontSize(9);
-      pdf.text('https://stareight-dx-site.pages.dev/contact.html', pw / 2, y + 20, {align:'center'});
-
-      // 全ページフッター
+      // ページフッター
       var pages = pdf.internal.getNumberOfPages();
       for (var p = 1; p <= pages; p++) {
         pdf.setPage(p);
         pdf.setFontSize(7);
         pdf.setTextColor(160, 160, 160);
-        pdf.setFont('helvetica', 'normal');
-        pdf.text('StarEight LLC  |  https://stareight-dx-site.pages.dev', pw/2, ph-6, {align:'center'});
-        pdf.text(p + ' / ' + pages, pw - m, ph - 6, {align:'right'});
+        pdf.text('StarEight LLC | https://stareight-dx-site.pages.dev', pw / 2, ph - 5, { align: 'center' });
+        pdf.text(p + '/' + pages, pw - margin, ph - 5, { align: 'right' });
       }
 
-      pdf.save('DX_Diagnosis_' + ds.replace(/\//g,'') + '.pdf');
+      pdf.save('DX_Diagnosis_' + ds.replace(/\//g, '') + '.pdf');
 
       // 成功
-      btn.innerHTML =
-        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">' +
-          '<polyline points="20 6 9 17 4 12"/>' +
-        '</svg> ダウンロード完了！';
+      btn.innerHTML = '✓ ダウンロード完了！';
       btn.style.background = 'linear-gradient(135deg,#27ae60 0%,#2ecc71 100%)';
       btn.style.opacity = '1';
       setTimeout(function() {
-        btn.innerHTML = originalHTML;
+        btn.innerHTML = origHTML;
         btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)';
         btn.disabled = false;
       }, 2500);
 
     } catch (err) {
-      console.error('PDF error:', err);
-      btn.innerHTML = 'エラーが発生しました。再試行してください。';
-      btn.style.background = '#e74c3c';
+      console.error('PDF generation error:', err);
+      alert('PDF生成エラー: ' + err.message);
+      btn.innerHTML = origHTML;
+      btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)';
       btn.style.opacity = '1';
-      setTimeout(function() {
-        btn.innerHTML = originalHTML;
-        btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)';
-        btn.disabled = false;
-      }, 3000);
+      btn.disabled = false;
     }
   }
 
-  function getLevelColor(level) {
-    switch(level) {
-      case 'A': return {r:45,g:139,b:87};
-      case 'B': return {r:46,g:117,b:182};
-      case 'C': return {r:230,g:126,b:34};
-      default:  return {r:204,g:68,b:68};
+  // ====== Canvas描画 ======
+  function drawContent(ctx, W, data, dateStr, dryRun) {
+    var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo","Yu Gothic",sans-serif';
+    var PAD = 40;
+    var CW = W - PAD * 2;
+    var y = 0;
+
+    // ヘッダー帯
+    if (!dryRun) {
+      ctx.fillStyle = '#1a5276';
+      ctx.fillRect(0, 0, W, 80);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 14px ' + FONT;
+      ctx.fillText('★ StarEight DX Consulting', PAD, 30);
+      ctx.font = 'bold 22px ' + FONT;
+      ctx.fillText('DX診断レポート', PAD, 58);
+      ctx.font = '12px ' + FONT;
+      ctx.textAlign = 'right';
+      ctx.fillText(dateStr, W - PAD, 58);
+      ctx.textAlign = 'left';
     }
+    y = 100;
+
+    // 総合スコア円
+    var cx = W / 2;
+    var lc = getLevelHex(data.level);
+    if (!dryRun) {
+      ctx.beginPath();
+      ctx.arc(cx, y + 50, 50, 0, Math.PI * 2);
+      ctx.strokeStyle = lc;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+      ctx.fillStyle = lc;
+      ctx.font = 'bold 48px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText(String(data.totalPct), cx, y + 58);
+      ctx.fillStyle = '#888888';
+      ctx.font = '14px ' + FONT;
+      ctx.fillText('/ 100点', cx, y + 78);
+    }
+    y += 115;
+
+    // DXレベル
+    if (!dryRun) {
+      ctx.fillStyle = lc;
+      ctx.font = 'bold 22px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText('DXレベル：' + data.level, cx, y);
+    }
+    y += 12;
+    if (!dryRun) {
+      ctx.fillStyle = '#666666';
+      ctx.font = '13px ' + FONT;
+      ctx.fillText(data.levelMsg, cx, y + 8);
+      ctx.textAlign = 'left';
+    }
+    y += 36;
+
+    // 区切り線
+    if (!dryRun) { drawLine(ctx, PAD, y, W - PAD); }
+    y += 16;
+
+    // カテゴリ別スコア
+    if (!dryRun) {
+      ctx.fillStyle = '#222222';
+      ctx.font = 'bold 17px ' + FONT;
+      ctx.fillText('カテゴリ別スコア', PAD, y);
+    }
+    y += 20;
+
+    data.catScores.forEach(function(c) {
+      var bc = getBarHex(c.pct);
+      if (!dryRun) {
+        ctx.fillStyle = '#444444';
+        ctx.font = '14px ' + FONT;
+        ctx.textAlign = 'left';
+        ctx.fillText(c.icon + ' ' + c.name, PAD, y);
+        ctx.fillStyle = bc;
+        ctx.font = 'bold 14px ' + FONT;
+        ctx.textAlign = 'right';
+        ctx.fillText(c.pct + '点', W - PAD, y);
+        ctx.textAlign = 'left';
+      }
+      y += 8;
+      if (!dryRun) {
+        ctx.fillStyle = '#e8e8e8';
+        roundRect(ctx, PAD, y, CW, 8, 4); ctx.fill();
+        if (c.pct > 0) {
+          ctx.fillStyle = bc;
+          roundRect(ctx, PAD, y, Math.max(8, (c.pct / 100) * CW), 8, 4); ctx.fill();
+        }
+      }
+      y += 22;
+    });
+
+    y += 8;
+    if (!dryRun) { drawLine(ctx, PAD, y, W - PAD); }
+    y += 16;
+
+    // TOP3アクション
+    if (!dryRun) {
+      ctx.fillStyle = '#222222';
+      ctx.font = 'bold 17px ' + FONT;
+      ctx.fillText('まず取り組むべきDXアクション TOP3', PAD, y);
+    }
+    y += 20;
+
+    for (var i = 0; i < 3 && i < data.sorted.length; i++) {
+      var cat = data.sorted[i];
+      var actionText = data.actionTexts[cat.name] || '';
+
+      if (!dryRun) {
+        ctx.fillStyle = '#2980b9';
+        roundRect(ctx, PAD, y - 12, 22, 18, 4); ctx.fill();
+        ctx.fillStyle = '#ffffff';
+        ctx.font = 'bold 12px ' + FONT;
+        ctx.textAlign = 'center';
+        ctx.fillText(String(i + 1), PAD + 11, y);
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#2980b9';
+        ctx.font = 'bold 14px ' + FONT;
+        ctx.fillText(cat.name + '（現在 ' + cat.pct + '点）', PAD + 28, y);
+      }
+      y += 14;
+
+      var wrapFont = '13px ' + FONT;
+      var lines = wrapText(ctx, actionText, CW - 28, wrapFont);
+      if (!dryRun) {
+        ctx.fillStyle = '#555555';
+        ctx.font = wrapFont;
+        lines.forEach(function(line) { ctx.fillText(line, PAD + 28, y); y += 18; });
+      } else {
+        y += lines.length * 18;
+      }
+      y += 12;
+    }
+
+    y += 12;
+
+    // CTA帯
+    if (!dryRun) {
+      ctx.fillStyle = '#1a5276';
+      roundRect(ctx, PAD, y, CW, 64, 8); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 15px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText('この診断結果をもとに、具体的な改善プランを無料でご提案します', cx, y + 28);
+      ctx.font = '11px ' + FONT;
+      ctx.fillText('https://stareight-dx-site.pages.dev/contact.html', cx, y + 48);
+      ctx.textAlign = 'left';
+    }
+    y += 64 + 16;
+
+    if (!dryRun) {
+      ctx.fillStyle = '#aaaaaa';
+      ctx.font = '10px ' + FONT;
+      ctx.textAlign = 'center';
+      ctx.fillText('© 2026 StarEight LLC. All rights reserved.', cx, y);
+      ctx.textAlign = 'left';
+    }
+    y += 20;
+
+    return y;
   }
 
-  function getBarColor(pct) {
-    if (pct >= 60) return {r:45,g:139,b:87};
-    if (pct >= 40) return {r:230,g:126,b:34};
-    return {r:204,g:68,b:68};
+  // ユーティリティ
+  function wrapText(ctx, text, maxW, font) {
+    ctx.font = font;
+    var lines = [], cur = '';
+    for (var i = 0; i < text.length; i++) {
+      var test = cur + text[i];
+      if (ctx.measureText(test).width > maxW && cur.length > 0) {
+        lines.push(cur);
+        cur = text[i];
+      } else { cur = test; }
+    }
+    if (cur) lines.push(cur);
+    return lines;
+  }
+
+  function roundRect(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x + r, y);
+    ctx.lineTo(x + w - r, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + r);
+    ctx.lineTo(x + w, y + h - r);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - r, y + h);
+    ctx.lineTo(x + r, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - r);
+    ctx.lineTo(x, y + r);
+    ctx.quadraticCurveTo(x, y, x + r, y);
+    ctx.closePath();
+  }
+
+  function drawLine(ctx, x1, y, x2) {
+    ctx.strokeStyle = '#dddddd';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(x1, y);
+    ctx.lineTo(x2, y);
+    ctx.stroke();
+  }
+
+  function getLevelHex(l) {
+    return l === 'A' ? '#2D8B57' : l === 'B' ? '#2E75B6' : l === 'C' ? '#E67E22' : '#CC4444';
+  }
+
+  function getBarHex(p) {
+    return p >= 60 ? '#2D8B57' : p >= 40 ? '#E67E22' : '#CC4444';
   }
 
 })();
