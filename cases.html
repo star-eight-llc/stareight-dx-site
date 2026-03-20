@@ -70,6 +70,63 @@
       <p><strong>Step 3. ダッシュボード構築（3〜5日）</strong><br>KPIが一画面で見えるダッシュボードを構築。月次推移グラフ、前年比較、目標との乖離をリアルタイム表示。スマホからも閲覧可能。</p>
       <p><strong>Step 4. 読み方レクチャー＋運用定着（1日＋1ヶ月フォロー）</strong><br>「この数字が下がったら何をすべきか」の判断基準をセットでお伝えします。</p>
 
+      <!-- ダッシュボードサンプル -->
+      <h3 style="font-size:16px;margin-top:24px;">ダッシュボードのイメージ</h3>
+      <div style="margin:16px 0;border:1px solid #e0e0e0;border-radius:12px;overflow:hidden;background:#fff;">
+        <svg width="100%" viewBox="0 0 680 380" style="display:block;">
+          <rect width="680" height="380" fill="#fff"/>
+          <text x="24" y="28" font-family="sans-serif" font-weight="600" font-size="13" fill="#333">月次KPIダッシュボード</text>
+          <text x="24" y="44" font-family="sans-serif" font-size="10" fill="#999">2026年3月</text>
+          <!-- KPI cards -->
+          <rect x="24" y="58" width="148" height="54" rx="8" fill="#EBF5FF" stroke="#d0e3f0" stroke-width="0.5"/>
+          <text x="36" y="76" font-family="sans-serif" font-size="10" fill="#666">月間売上</text>
+          <text x="36" y="100" font-family="sans-serif" font-weight="600" font-size="17" fill="#2E75B6">¥4,280,000</text>
+          <rect x="184" y="58" width="148" height="54" rx="8" fill="#E0F7FA" stroke="#b2ebf2" stroke-width="0.5"/>
+          <text x="196" y="76" font-family="sans-serif" font-size="10" fill="#666">粗利率</text>
+          <text x="196" y="100" font-family="sans-serif" font-weight="600" font-size="17" fill="#00897B">62.3%</text>
+          <rect x="344" y="58" width="148" height="54" rx="8" fill="#FFF8E1" stroke="#ffe082" stroke-width="0.5"/>
+          <text x="356" y="76" font-family="sans-serif" font-size="10" fill="#666">リピート率</text>
+          <text x="356" y="100" font-family="sans-serif" font-weight="600" font-size="17" fill="#C87B1A">48.7%</text>
+          <rect x="504" y="58" width="148" height="54" rx="8" fill="#F3E8FF" stroke="#d1c4e9" stroke-width="0.5"/>
+          <text x="516" y="76" font-family="sans-serif" font-size="10" fill="#666">客単価</text>
+          <text x="516" y="100" font-family="sans-serif" font-weight="600" font-size="17" fill="#7B61FF">¥8,560</text>
+          <!-- Chart title -->
+          <text x="24" y="142" font-family="sans-serif" font-weight="600" font-size="12" fill="#333">売上推移（6ヶ月）</text>
+          <line x1="24" y1="150" x2="650" y2="150" stroke="#eee" stroke-width="0.5"/>
+          <!-- Y axis labels -->
+          <text x="24" y="172" font-family="sans-serif" font-size="9" fill="#bbb">500万</text>
+          <text x="24" y="212" font-family="sans-serif" font-size="9" fill="#bbb">400万</text>
+          <text x="24" y="252" font-family="sans-serif" font-size="9" fill="#bbb">300万</text>
+          <text x="24" y="292" font-family="sans-serif" font-size="9" fill="#bbb">200万</text>
+          <!-- Grid lines -->
+          <line x1="60" y1="168" x2="650" y2="168" stroke="#f5f5f5" stroke-width="0.5"/>
+          <line x1="60" y1="208" x2="650" y2="208" stroke="#f5f5f5" stroke-width="0.5"/>
+          <line x1="60" y1="248" x2="650" y2="248" stroke="#f5f5f5" stroke-width="0.5"/>
+          <line x1="60" y1="288" x2="650" y2="288" stroke="#f5f5f5" stroke-width="0.5"/>
+          <!-- Bars -->
+          <rect x="80" y="248" width="70" height="70" rx="4" fill="#2E75B6" opacity="0.35"/>
+          <rect x="175" y="228" width="70" height="90" rx="4" fill="#2E75B6" opacity="0.45"/>
+          <rect x="270" y="208" width="70" height="110" rx="4" fill="#2E75B6" opacity="0.55"/>
+          <rect x="365" y="228" width="70" height="90" rx="4" fill="#2E75B6" opacity="0.5"/>
+          <rect x="460" y="198" width="70" height="120" rx="4" fill="#2E75B6" opacity="0.65"/>
+          <rect x="555" y="178" width="70" height="140" rx="4" fill="#2E75B6" opacity="0.85"/>
+          <!-- X axis -->
+          <line x1="60" y1="318" x2="650" y2="318" stroke="#ddd" stroke-width="0.5"/>
+          <text x="115" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">10月</text>
+          <text x="210" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">11月</text>
+          <text x="305" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">12月</text>
+          <text x="400" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">1月</text>
+          <text x="495" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">2月</text>
+          <text x="590" y="336" font-family="sans-serif" font-size="10" fill="#999" text-anchor="middle">3月</text>
+          <!-- Trend line -->
+          <polyline points="115,258 210,238 305,218 400,238 495,208 590,188" fill="none" stroke="#2E75B6" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="590" cy="188" r="3" fill="#2E75B6"/>
+          <!-- Sample label -->
+          <text x="650" y="366" font-family="sans-serif" font-size="8" fill="#ccc" text-anchor="end">※ サンプルデータです</text>
+        </svg>
+      </div>
+      <p style="font-size:12px;color:var(--gray-500);margin-top:4px;">上記はダッシュボードの構成イメージです。実際の画面は御社の業種・KPIに合わせてカスタマイズします。</p>
+
       <h3 style="font-size:16px;margin-top:24px;">使用ツール・技術</h3>
       <p>Googleスプレッドシート、Google Apps Script、Excel、Power Query。大規模な場合はTableau / Looker Studioも対応可能。</p>
 
