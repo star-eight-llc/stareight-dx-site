@@ -258,7 +258,7 @@
     var data = _resultData;
     var d = new Date();
     var ds = d.getFullYear() + '/' + String(d.getMonth()+1).padStart(2,'0') + '/' + String(d.getDate()).padStart(2,'0');
-    var W = 840, DPR = 2;
+    var W = 720, DPR = 2;
     var canvas = document.createElement('canvas'); canvas.width = W * DPR;
     var ctx = canvas.getContext('2d'); ctx.scale(DPR, DPR);
     var totalH = drawContent(ctx, W, data, ds, true);
@@ -297,22 +297,22 @@
     var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
     var PAD = 50, CW = W - PAD * 2, y = 0, headerH = 90;
     if (!dryRun) { ctx.fillStyle='#1a5276'; ctx.fillRect(0,0,W,headerH); ctx.fillStyle='#fff'; ctx.font='bold 15px '+FONT; ctx.fillText('★ StarEight DX Consulting',PAD,35); ctx.font='bold 26px '+FONT; ctx.fillText('DX診断レポート',PAD,65); ctx.font='13px '+FONT; ctx.textAlign='right'; ctx.fillText('診断日：'+dateStr,W-PAD,65); ctx.textAlign='left'; }
-    y=headerH+40;
+    y=headerH+50;
     var cx=W/2, lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
-    y+=circleR*2+30;
+    y+=circleR*2+35;
     if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
     if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}
     y+=30;
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
-    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='15px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 16px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=10; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,10,5);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(10,(c.pct/100)*CW),10,5);ctx.fill();}} y+=30; });
-    y+=20;
+    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='15px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 16px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=10; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,10,5);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(10,(c.pct/100)*CW),10,5);ctx.fill();}} y+=35; });
+    y+=25;
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('まず取り組むべきDXアクション TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,320,3);}
     y+=32;
-    for(var i=0;i<3&&i<data.sorted.length;i++){ var cat=data.sorted[i],actionText=data.actionTexts[cat.name]||''; var cardFont='14px '+FONT,lines=wrapText(ctx,actionText,CW-60,cardFont),cardH=38+lines.length*20+16; if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,cardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,cardH,8);ctx.stroke();ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+8,4,cardH-16);} var ix=PAD+20,iy=y+24; if(!dryRun){ctx.fillStyle='#2980b9';ctx.font='bold 14px '+FONT;ctx.fillText('ACTION '+(i+1)+'：'+cat.icon+' '+cat.name+'（現在 '+cat.pct+'点）',ix,iy);} iy+=22; if(!dryRun){ctx.fillStyle='#555';ctx.font=cardFont;lines.forEach(function(l){ctx.fillText(l,ix,iy);iy+=20;});} y+=cardH+14; }
-    y+=30;
+    for(var i=0;i<3&&i<data.sorted.length;i++){ var cat=data.sorted[i],actionText=data.actionTexts[cat.name]||''; var cardFont='14px '+FONT,lines=wrapText(ctx,actionText,CW-60,cardFont),cardH=38+lines.length*20+16; if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,cardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,cardH,8);ctx.stroke();ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+8,4,cardH-16);} var ix=PAD+20,iy=y+24; if(!dryRun){ctx.fillStyle='#2980b9';ctx.font='bold 14px '+FONT;ctx.fillText('ACTION '+(i+1)+'：'+cat.icon+' '+cat.name+'（現在 '+cat.pct+'点）',ix,iy);} iy+=22; if(!dryRun){ctx.fillStyle='#555';ctx.font=cardFont;lines.forEach(function(l){ctx.fillText(l,ix,iy);iy+=20;});} y+=cardH+18; }
+    y+=35;
     // ====== 御社の課題に対応しやすい支援例 TOP3 ======
     if(data.svcTop3 && data.svcTop3.length > 0){
       if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('御社の課題に対応しやすい支援例 TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,340,3);}
@@ -330,7 +330,7 @@
         if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 15px '+FONT;ctx.fillText((si+1)+'. '+sv.name,sx,sy);ctx.fillStyle=degColor;ctx.font='bold 12px '+FONT;ctx.textAlign='right';ctx.fillText(degLabel,W-PAD-16,sy);ctx.textAlign='left';}
         sy+=22;
         if(!dryRun){ctx.fillStyle='#555';ctx.font=svFont;svLines.forEach(function(l){ctx.fillText(l,sx,sy);sy+=20;});}
-        y+=svCardH+14;
+        y+=svCardH+18;
       }
       y+=10;
       if(!dryRun){ctx.fillStyle='#aaa';ctx.font='11px '+FONT;ctx.fillText('※上記は診断結果をもとにした一般的なご提案です。実際の進め方は、業種や業務内容に応じて異なります。',PAD,y);}
