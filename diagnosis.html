@@ -187,6 +187,8 @@ function selectAnswer(val) {
   answers[currentQ] = val;
   document.querySelectorAll('.diag-option').forEach(function(el) { el.classList.remove('selected'); });
   event.target.classList.add('selected');
+  // 選択後、少し間を置いて自動で次の質問へ
+  setTimeout(function() { nextQuestion(); }, 350);
 }
 
 function nextQuestion() {
