@@ -8,6 +8,16 @@
   var _resultData = null;
   var _jspdfLoaded = false;
   var _orig = window.showResults;
+  var _diagStartTime = null;
+
+  // 診断開始時刻を記録（startDiagnosisをラップ）
+  var _origStart = window.startDiagnosis;
+  if (typeof _origStart === 'function') {
+    window.startDiagnosis = function() {
+      _diagStartTime = new Date();
+      _origStart.apply(this, arguments);
+    };
+  }
 
   window.showResults = function() {
     var catScores = categories.map(function(cat, ci) {
@@ -87,6 +97,16 @@
         cat_AI活用: catFields['AI活用'] || '',
         cat_DX推進体制: catFields['DX推進体制'] || '',
         top3: top3Str,
+        // 流入元
+        referrer: document.referrer || '(direct)',
+        utm_source: (new URLSearchParams(window.location.search)).get('utm_source') || '',
+        utm_medium: (new URLSearchParams(window.location.search)).get('utm_medium') || '',
+        utm_campaign: (new URLSearchParams(window.location.search)).get('utm_campaign') || '',
+        // 所要時間（秒）
+        duration_sec: _diagStartTime ? Math.round((now - _diagStartTime) / 1000) : '',
+        // デバイス情報
+        screen_width: window.innerWidth,
+        device: window.innerWidth <= 768 ? 'スマホ' : window.innerWidth <= 1024 ? 'タブレット' : 'PC',
         userAgent: navigator.userAgent
       };
 
@@ -120,9 +140,59 @@
       setTimeout(function() { form.remove(); iframe.remove(); }, 10000);
 
       console.log('DX診断データ送信完了: ' + diagId);
+
+      // === 診断後の行動トラッキング ===
+      // PDFダウンロード・無料相談クリックを検出してGASに追加送信
+      setTimeout(function() {
+        // PDFボタンのクリックを監視
+        var pdfBtn = document.getElementById('pdfDownloadBtn');
+        if (pdfBtn) {
+          pdfBtn.addEventListener('click', function() {
+            sendAction(diagId, 'PDF_DOWNLOAD');
+          }, { once: true });
+        }
+        // 無料相談リンクのクリックを監視
+        var links = document.querySelectorAll('a[href*="contact.html"]');
+        links.forEach(function(link) {
+          link.addEventListener('click', function() {
+            sendAction(diagId, 'CONTACT_CLICK');
+          }, { once: true });
+        });
+      }, 500);
+
     } catch (e) {
       console.log('GAS送信スキップ:', e);
     }
+  }
+
+  // === 診断後の行動をGASに追加送信 ===
+  function sendAction(diagId, action) {
+    try {
+      var iframe2 = document.createElement('iframe');
+      iframe2.name = '__gasAction';
+      iframe2.style.display = 'none';
+      document.body.appendChild(iframe2);
+
+      var form2 = document.createElement('form');
+      form2.method = 'POST';
+      form2.action = GAS_URL;
+      form2.target = '__gasAction';
+      form2.style.display = 'none';
+
+      var fields = { diagId: diagId, action: action, action_time: new Date().toISOString() };
+      Object.keys(fields).forEach(function(k) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = fields[k];
+        form2.appendChild(input);
+      });
+
+      document.body.appendChild(form2);
+      form2.submit();
+      setTimeout(function() { form2.remove(); iframe2.remove(); }, 10000);
+      console.log('行動トラッキング送信: ' + diagId + ' / ' + action);
+    } catch (e) {}
   }
 
   // ====== CTAリンクに診断データを付与 ======
