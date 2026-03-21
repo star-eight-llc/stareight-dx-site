@@ -355,7 +355,7 @@ img { max-width: 100%; height: auto; }
 .form-group textarea { min-height: 140px; resize: vertical; }
 
 /* ===== FOOTER ===== */
-.site-footer { background: var(--navy); color: rgba(255,255,255,0.65); padding: 56px 0 28px; }
+.site-footer { background: #0e2e1e; color: rgba(255,255,255,0.65); padding: 56px 0 28px; }
 .footer-inner { display: flex; justify-content: space-between; gap: 48px; margin-bottom: 36px; }
 .footer-brand .footer-logo {
   font-family: 'DM Sans', sans-serif; font-size: 20px; font-weight: 800;
