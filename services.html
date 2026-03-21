@@ -6,6 +6,16 @@
 <title>サービス一覧 | スターエイト DXコンサルティング</title>
 <meta name="description" content="無料DX診断・無料相談からDX顧問まで、7つのサービス体系。中小企業のDXを段階的に支援します。">
 <link rel="stylesheet" href="css/style.css">
+<style>
+.svc-card{padding:28px;border-radius:12px;border:1px solid var(--gray-200);margin-bottom:24px;transition:box-shadow 0.2s;background:#fff}
+.svc-card:hover{box-shadow:0 4px 16px rgba(0,0,0,0.06)}
+.svc-icon{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;border-radius:12px;flex-shrink:0}
+.svc-icon svg{width:22px;height:22px;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round;fill:none}
+.svc-price{display:inline-block;padding:6px 16px;border-radius:20px;font-size:16px;font-weight:700;margin:12px 0 8px}
+.svc-free{background:#E8F5E9;color:#2D8B57}
+.svc-paid{background:#EBF5FF;color:#2E75B6}
+.svc-note{font-size:13px;color:var(--gray-500);margin:0}
+</style>
 </head>
 <body>
 <header class="site-header">
@@ -32,89 +42,61 @@
 
 <section class="section">
   <div class="container">
-    <div class="section-header fade-in">
-      <h2>導入の流れ</h2>
-      <p class="subtitle">Step 1 の無料相談 or 無料DX診断から段階的に進めます</p>
-      <div class="line"></div>
-    </div>
+    <div class="section-header fade-in"><h2>導入の流れ</h2><p class="subtitle">Step 1 の無料相談 or 無料DX診断から段階的に進めます</p><div class="line"></div></div>
     <div class="flow fade-in">
       <div class="flow-step"><h4>無料相談 / DX診断</h4><p>現状把握（無料）</p></div>
       <div class="flow-step"><h4>DX改善プラン</h4><p>課題・優先度の整理</p></div>
       <div class="flow-step"><h4>実行支援</h4><p>Excel/データ/AI</p></div>
       <div class="flow-step"><h4>DX顧問</h4><p>月額で継続伴走</p></div>
     </div>
-    <p style="text-align:center;font-size:14px;color:var(--gray-500);margin-top:16px;" class="fade-in">どのサービスを選べばよいかわからない場合は、まずは<strong>無料相談</strong>または<strong>無料DX診断</strong>からご利用ください。<br>現状を整理したうえで、必要な支援だけをご提案します。</p>
+    <p style="text-align:center;font-size:14px;color:var(--gray-500);margin-top:16px;" class="fade-in">どのサービスを選べばよいかわからない場合は、まずは<strong>無料相談</strong>または<strong>無料DX診断</strong>からご利用ください。</p>
   </div>
 </section>
 
 <section class="section" style="background:var(--gray-50);">
   <div class="container" style="max-width:800px;">
-    <div class="section-header fade-in">
-      <h2>7つのサービス</h2>
-      <div class="line"></div>
-    </div>
+    <div class="section-header fade-in"><h2>7つのサービス</h2><div class="line"></div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 00</span>
-      <h3>無料相談（60分・オンライン可）</h3>
-      <p>「DXって何から始めればいい？」「うちの会社にもDXは必要？」——そんな漠然としたご相談でも大歓迎です。60分のオンライン面談で、御社の現状と課題を一緒に整理し、DXの方向性をお伝えします。サービスの押し売りは行いませんので、DXに詳しくない方でも安心してご利用いただけます。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">無料</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#E0F7FA;color:#00897B;"><svg viewBox="0 0 24 24"><path d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 0 1-.825-.242m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0 0 11.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 00</span><h3>無料相談（60分・オンライン可）</h3><p>「DXって何から始めればいい？」——そんな漠然としたご相談でも大歓迎です。60分のオンライン面談で、御社の現状と課題を一緒に整理し、DXの方向性をお伝えします。サービスの押し売りは行いません。</p><div class="svc-price svc-free">無料</div></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 01</span>
-      <h3>無料DX診断</h3>
-      <p>30問のチェックリストで御社のDXレベルを7カテゴリ別に可視化。スコアに基づき「まず取り組むべきDXアクション TOP3」を提示します。オンラインで5分で完了。個人情報の入力は不要です。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">無料</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#EBF5FF;color:#2E75B6;"><svg viewBox="0 0 24 24"><path d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 0 1 3 19.875v-6.75ZM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V8.625ZM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 0 1-1.125-1.125V4.125Z"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 01</span><h3>無料DX診断</h3><p>30問のチェックリストで御社のDXレベルを7カテゴリ別に可視化。「まず取り組むべきDXアクション TOP3」を提示。オンライン5分、個人情報不要です。</p><div class="svc-price svc-free">無料</div></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 02</span>
-      <h3>DX改善プラン策定</h3>
-      <p>DX診断の結果を元に、具体的な改善計画を策定。課題の優先順位、必要なツール・コスト・期間を明記した実行計画書をお渡しします。「何から手をつけるべきか」が明確になります。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">5万円〜（税別）</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ ご相談後にお見積もりをご提示します。まずは小さなテーマから開始可能です。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#E8F5E9;color:#2D8B57;"><svg viewBox="0 0 24 24"><path d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 0 0 2.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 0 0-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 0 0 .75-.75 2.25 2.25 0 0 0-.1-.664m-5.8 0A2.251 2.251 0 0 1 13.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25ZM6.75 12h.008v.008H6.75V12Zm0 3h.008v.008H6.75V15Zm0 3h.008v.008H6.75V18Z"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 02</span><h3>DX改善プラン策定</h3><p>DX診断の結果を元に、具体的な改善計画を策定。課題の優先順位、必要なツール・コスト・期間を明記した実行計画書をお渡しします。</p><div class="svc-price svc-paid">5万円〜（税別）</div><p class="svc-note">ご相談後にお見積もりをご提示します。まずは小さなテーマから開始可能です。</p></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 03</span>
-      <h3>Excel業務改善</h3>
-      <p>属人化したExcelを整理・最適化。関数の見直し、マクロ（VBA）による自動化、テンプレート化を実施。「特定の人がいないと回らない」状態を解消します。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">10万円〜（税別）/ 案件</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ ご相談後にお見積もりをご提示します。無理なご契約はおすすめしません。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#FFF8E1;color:#C87B1A;"><svg viewBox="0 0 24 24"><path d="M3.375 19.5h17.25m-17.25 0a1.125 1.125 0 0 1-1.125-1.125M3.375 19.5h7.5c.621 0 1.125-.504 1.125-1.125m-9.75 0V5.625m0 12.75v-1.5c0-.621.504-1.125 1.125-1.125m18.375 2.625V5.625"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 03</span><h3>Excel業務改善</h3><p>属人化したExcelを整理・最適化。関数の見直し、マクロ（VBA）による自動化、テンプレート化を実施。「特定の人がいないと回らない」状態を解消します。</p><div class="svc-price svc-paid">10万円〜（税別）/ 案件</div><p class="svc-note">ご相談後にお見積もりをご提示します。無理なご契約はおすすめしません。</p></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 04</span>
-      <h3>データ可視化</h3>
-      <p>売上・顧客・在庫などのデータをダッシュボード化。Googleスプレッドシート、Excel、またはBIツールで、経営数字をリアルタイムに把握できる環境を構築します。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">10万円〜（税別）/ 案件</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ まずは小さなテーマから開始可能です。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#EBF5FF;color:#2E75B6;"><svg viewBox="0 0 24 24"><path d="M3.75 3v11.25A2.25 2.25 0 0 0 6 16.5h2.25M3.75 3h-1.5m1.5 0h16.5m0 0h1.5m-1.5 0v11.25A2.25 2.25 0 0 1 18 16.5h-2.25m-7.5 0h7.5m-7.5 0-1 3m8.5-3 1 3m0 0 .5 1.5m-.5-1.5h-9.5m0 0-.5 1.5m.75-9 3-3 2.148 2.148A12.061 12.061 0 0 1 16.5 7.605"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 04</span><h3>データ可視化</h3><p>売上・顧客・在庫などのデータをダッシュボード化。経営数字をリアルタイムに把握できる環境を構築します。</p><div class="svc-price svc-paid">10万円〜（税別）/ 案件</div><p class="svc-note">まずは小さなテーマから開始可能です。</p></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 05</span>
-      <h3>データ分析</h3>
-      <p>売上分析・顧客分析・KPI設計など、データに基づく経営判断を支援。Pythonを用いた高度な統計分析・予測モデル構築も対応可能。分析レポートと「具体的な次のアクション」をセットで納品します。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">15万円〜（税別）/ 案件</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ ご相談後にお見積もりをご提示します。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#FDE8E8;color:#CC4444;"><svg viewBox="0 0 24 24"><path d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 05</span><h3>データ分析</h3><p>売上分析・顧客分析・KPI設計など、データに基づく経営判断を支援。Pythonを用いた高度な統計分析・予測モデル構築にも対応。分析レポートと具体的アクションをセットで納品します。</p><div class="svc-price svc-paid">15万円〜（税別）/ 案件</div><p class="svc-note">ご相談後にお見積もりをご提示します。</p></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 06</span>
-      <h3>生成AI活用支援</h3>
-      <p>ChatGPT・Claude等の生成AIを業務に導入。議事録自動作成、メール文面生成、社内FAQ、データ整理など、御社の業務に合わせた活用方法を設計・導入します。社員向けの研修も対応。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">10万円〜（税別）/ 案件</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ まずは小さなテーマから開始可能です。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#F3E8FF;color:#7B61FF;"><svg viewBox="0 0 24 24"><path d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456Z"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 06</span><h3>生成AI活用支援</h3><p>ChatGPT・Claude等の生成AIを業務に導入。議事録自動作成、メール文面生成、社内FAQ、データ整理など、御社の業務に合わせた活用方法を設計・導入します。研修も対応。</p><div class="svc-price svc-paid">10万円〜（税別）/ 案件</div><p class="svc-note">まずは小さなテーマから開始可能です。</p></div>
+    </div></div>
 
-    <div class="fade-in" style="margin-bottom:32px;">
-      <span class="tag">SERVICE 07</span>
-      <h3>DX顧問（月額）</h3>
-      <p>月1回の定例ミーティング＋随時チャット相談で、御社のDXを継続的にサポート。KPIレビュー、新しい課題の発見、ツール導入のアドバイスなど、経営者のDX参謀として伴走します。</p>
-      <p style="font-size:18px;font-weight:700;color:var(--blue);">月額5万円〜（税別）</p>
-      <p style="font-size:13px;color:var(--gray-500);">※ まずは3ヶ月からお試し可能です。</p>
-    </div>
+    <div class="svc-card fade-in"><div style="display:flex;gap:16px;align-items:flex-start;">
+      <div class="svc-icon" style="background:#E0F7FA;color:#00897B;"><svg viewBox="0 0 24 24"><path d="M18 18.72a9.094 9.094 0 0 0 3.741-.479 3 3 0 0 0-4.682-2.72m.94 3.198.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0 1 12 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 0 1 6 18.719m12 0a5.971 5.971 0 0 0-.941-3.197m0 0A5.995 5.995 0 0 0 12 12.75a5.995 5.995 0 0 0-5.058 2.772m0 0a3 3 0 0 0-4.681 2.72 8.986 8.986 0 0 0 3.74.477m.94-3.197a5.971 5.971 0 0 0-.94 3.197M15 6.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Zm6 3a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Zm-13.5 0a2.25 2.25 0 1 1-4.5 0 2.25 2.25 0 0 1 4.5 0Z"/></svg></div>
+      <div style="flex:1;"><span class="tag">SERVICE 07</span><h3>DX顧問（月額）</h3><p>月1回の定例ミーティング＋随時チャット相談で、御社のDXを継続的にサポート。KPIレビュー、課題発見、ツール導入のアドバイスなど、経営者のDX参謀として伴走します。</p><div class="svc-price svc-paid">月額5万円〜（税別）</div><p class="svc-note">まずは3ヶ月からお試し可能です。</p></div>
+    </div></div>
+
   </div>
 </section>
 
@@ -132,18 +114,9 @@
 <footer class="site-footer">
   <div class="container">
     <div class="footer-inner">
-      <div class="footer-brand">
-        <div class="footer-logo"><span class="star">★</span> StarEight DX</div>
-        <p>中小企業のDXを、わかりやすく。</p>
-      </div>
-      <div class="footer-links">
-        <h4>サービス</h4>
-        <ul><li><a href="services.html">サービス一覧</a></li><li><a href="diagnosis.html">無料DX診断</a></li><li><a href="cases.html">支援内容の具体例</a></li></ul>
-      </div>
-      <div class="footer-links">
-        <h4>ご相談</h4>
-        <ul><li><a href="contact.html">無料相談を予約</a></li><li><a href="about.html">代表紹介</a></li></ul>
-      </div>
+      <div class="footer-brand"><div class="footer-logo"><span class="star">★</span> StarEight DX</div><p>中小企業のDXを、わかりやすく。</p></div>
+      <div class="footer-links"><h4>サービス</h4><ul><li><a href="services.html">サービス一覧</a></li><li><a href="diagnosis.html">無料DX診断</a></li><li><a href="cases.html">支援内容の具体例</a></li></ul></div>
+      <div class="footer-links"><h4>ご相談</h4><ul><li><a href="contact.html">無料相談を予約</a></li><li><a href="about.html">代表紹介</a></li></ul></div>
     </div>
     <div class="footer-bottom">&copy; 2026 StarEight LLC. All rights reserved.</div>
   </div>
