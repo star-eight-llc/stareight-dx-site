@@ -8,16 +8,6 @@
   var _resultData = null;
   var _jspdfLoaded = false;
   var _orig = window.showResults;
-  var _diagStartTime = null;
-
-  // 診断開始時刻を記録（startDiagnosisをラップ）
-  var _origStart = window.startDiagnosis;
-  if (typeof _origStart === 'function') {
-    window.startDiagnosis = function() {
-      _diagStartTime = new Date();
-      _origStart.apply(this, arguments);
-    };
-  }
 
   window.showResults = function() {
     var catScores = categories.map(function(cat, ci) {
@@ -31,24 +21,45 @@
     var totalScore = 0, totalMax = 0;
     catScores.forEach(function(c) { totalScore += c.score; totalMax += c.max; });
     var totalPct = Math.round((totalScore / totalMax) * 100);
-    var level, levelMsg;
-    if (totalPct >= 80) { level = 'A'; levelMsg = 'DX先進企業です。さらなる高度化を目指しましょう。'; }
-    else if (totalPct >= 60) { level = 'B'; levelMsg = '基礎は整っています。データ活用・AI導入で次のステージへ。'; }
-    else if (totalPct >= 40) { level = 'C'; levelMsg = 'DXの入り口に立っています。まずは業務のデジタル化から。'; }
-    else { level = 'D'; levelMsg = 'DXの第一歩を踏み出しましょう。無料DX診断で具体的な計画を。'; }
+    var level, levelName, levelMsg;
+    if (totalPct >= 80) { level = 'A'; levelName = '発展活用期'; levelMsg = 'DXの基盤はかなり整っています。データ活用やAI活用をさらに実務へ定着させることで、より高い成果につなげやすい状態です。'; }
+    else if (totalPct >= 60) { level = 'B'; levelName = '基礎整備期'; levelMsg = 'DXの土台はできつつありますが、改善余地も見られます。優先順位をつけて取り組むことで、業務効率や意思決定の質をさらに高められます。'; }
+    else if (totalPct >= 40) { level = 'C'; levelName = '改善着手期'; levelMsg = '複数のテーマで課題が見られます。ただし、すべてを一度に進める必要はありません。効果が出やすいテーマから順に進めるのがおすすめです。'; }
+    else { level = 'D'; levelName = '初期段階'; levelMsg = 'DXはこれから整備していく段階です。まずは現状の課題を整理し、何から始めるべきかを明確にすることが重要です。'; }
     var sorted = catScores.slice().sort(function(a, b) { return a.pct - b.pct; });
     var actionTexts = {
-      "業務プロセス": "業務手順書の作成と、紙業務のデジタル移行から着手。Googleフォーム等の無料ツールで始められます。",
-      "データ管理": "まず顧客・売上データの一元管理を。Googleスプレッドシートでの管理テンプレートをご提供可能です。",
-      "データ活用": "月次KPI（売上・客数・客単価・リピート率）の可視化から。スターエイトの経営スコアカードがお役に立てます。",
-      "ITツール活用": "Google Workspace等のクラウドツール導入を推奨。初期設定・移行をサポートします。",
-      "セキュリティ": "パスワードポリシーの策定と、個人情報取扱いルールの文書化を最優先で。",
-      "AI活用": "まずはChatGPTで議事録作成やメール文面生成から試しましょう。業務別の活用ガイドを提供可能です。",
-      "DX推進体制": "DX推進の担当者を決め、年間予算を設定することが第一歩。スターエイトのDX顧問がサポートします。"
+      "業務プロセス": "手順の整理と繰り返し業務の見直しから始めましょう。",
+      "データ管理": "売上・経費・顧客データを、見やすく整理・統合するところから始めましょう。",
+      "データ活用": "売上・顧客・KPIの分析結果を、具体的な改善行動につなげる仕組みを整えましょう。",
+      "業務の見える化": "売上・利益・KPIを一画面で確認できる状態を目指しましょう。",
+      "業務の標準化・効率化": "属人化の解消と、日常業務の効率化から優先して進めましょう。",
+      "AI活用": "AIを\u201c試して終わり\u201dにせず、日常業務に組み込むテーマを決めましょう。",
+      "DX推進体制": "優先順位、担当、進め方を整理し、継続して進められる体制を整えましょう。"
     };
+
+    // サービスTOP3計算
+    var svcMap = {
+      "Excel業務改善": [1,2,3,5,7,14,16,17],
+      "データ可視化": [4,5,6,7,8,9,12],
+      "データ分析": [8,10,11,22],
+      "生成AI活用支援": [13,19,20,21,22,23],
+      "DX改善プラン策定": [0,13,14,15,16,17,18,26,28,29],
+      "DX顧問": [11,15,24,25,26,27,28,29]
+    };
+    var svcRank = [];
+    Object.keys(svcMap).forEach(function(name) {
+      var qIdxs = svcMap[name];
+      var issueScore = 0;
+      qIdxs.forEach(function(qi) { issueScore += (2 - (answers[qi] || 0)); });
+      svcRank.push({ name: name, avg: issueScore / qIdxs.length, count: qIdxs.length });
+    });
+    svcRank.sort(function(a,b) { return b.avg - a.avg || a.count - b.count; });
+    var svcTop3 = svcRank.slice(0, 3);
+
     _resultData = {
-      totalPct: totalPct, level: level, levelMsg: levelMsg,
-      catScores: catScores, sorted: sorted, actionTexts: actionTexts
+      totalPct: totalPct, level: level, levelName: levelName, levelMsg: levelMsg,
+      catScores: catScores, sorted: sorted, actionTexts: actionTexts,
+      svcTop3: svcTop3, allAnswers: answers.slice()
     };
     _orig.apply(this, arguments);
 
@@ -88,25 +99,26 @@
         diagId: diagId,
         timestamp: now.toISOString(),
         score: data.totalPct,
-        level: 'Level ' + data.level,
+        level: data.levelName || ('Level ' + data.level),
         cat_業務プロセス: catFields['業務プロセス'] || '',
         cat_データ管理: catFields['データ管理'] || '',
         cat_データ活用: catFields['データ活用'] || '',
-        cat_ITツール活用: catFields['ITツール活用'] || '',
-        cat_セキュリティ: catFields['セキュリティ'] || '',
+        cat_業務の見える化: catFields['業務の見える化'] || '',
+        cat_標準化効率化: catFields['業務の標準化・効率化'] || '',
         cat_AI活用: catFields['AI活用'] || '',
         cat_DX推進体制: catFields['DX推進体制'] || '',
         top3: top3Str,
-        // 流入元
         referrer: document.referrer || '(direct)',
         utm_source: (new URLSearchParams(window.location.search)).get('utm_source') || '',
         utm_medium: (new URLSearchParams(window.location.search)).get('utm_medium') || '',
         utm_campaign: (new URLSearchParams(window.location.search)).get('utm_campaign') || '',
-        // 所要時間（秒）
         duration_sec: _diagStartTime ? Math.round((now - _diagStartTime) / 1000) : '',
-        // デバイス情報
         screen_width: window.innerWidth,
         device: window.innerWidth <= 768 ? 'スマホ' : window.innerWidth <= 1024 ? 'タブレット' : 'PC',
+        svc_top1: (data.svcTop3 && data.svcTop3[0]) ? data.svcTop3[0].name : '',
+        svc_top2: (data.svcTop3 && data.svcTop3[1]) ? data.svcTop3[1].name : '',
+        svc_top3: (data.svcTop3 && data.svcTop3[2]) ? data.svcTop3[2].name : '',
+        answers_all: (data.allAnswers || []).join(','),
         userAgent: navigator.userAgent
       };
 
@@ -140,59 +152,9 @@
       setTimeout(function() { form.remove(); iframe.remove(); }, 10000);
 
       console.log('DX診断データ送信完了: ' + diagId);
-
-      // === 診断後の行動トラッキング ===
-      // PDFダウンロード・無料相談クリックを検出してGASに追加送信
-      setTimeout(function() {
-        // PDFボタンのクリックを監視
-        var pdfBtn = document.getElementById('pdfDownloadBtn');
-        if (pdfBtn) {
-          pdfBtn.addEventListener('click', function() {
-            sendAction(diagId, 'PDF_DOWNLOAD');
-          }, { once: true });
-        }
-        // 無料相談リンクのクリックを監視
-        var links = document.querySelectorAll('a[href*="contact.html"]');
-        links.forEach(function(link) {
-          link.addEventListener('click', function() {
-            sendAction(diagId, 'CONTACT_CLICK');
-          }, { once: true });
-        });
-      }, 500);
-
     } catch (e) {
       console.log('GAS送信スキップ:', e);
     }
-  }
-
-  // === 診断後の行動をGASに追加送信 ===
-  function sendAction(diagId, action) {
-    try {
-      var iframe2 = document.createElement('iframe');
-      iframe2.name = '__gasAction';
-      iframe2.style.display = 'none';
-      document.body.appendChild(iframe2);
-
-      var form2 = document.createElement('form');
-      form2.method = 'POST';
-      form2.action = GAS_URL;
-      form2.target = '__gasAction';
-      form2.style.display = 'none';
-
-      var fields = { diagId: diagId, action: action, action_time: new Date().toISOString() };
-      Object.keys(fields).forEach(function(k) {
-        var input = document.createElement('input');
-        input.type = 'hidden';
-        input.name = k;
-        input.value = fields[k];
-        form2.appendChild(input);
-      });
-
-      document.body.appendChild(form2);
-      form2.submit();
-      setTimeout(function() { form2.remove(); iframe2.remove(); }, 10000);
-      console.log('行動トラッキング送信: ' + diagId + ' / ' + action);
-    } catch (e) {}
   }
 
   // ====== CTAリンクに診断データを付与 ======
