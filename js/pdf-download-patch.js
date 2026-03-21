@@ -50,7 +50,7 @@
   };
 
   // ====== GASスプレッドシートに診断結果を送信 ======
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbxPoxAIh_9lQby2V0MeRmhh6Ene4AfKQ1hhVNpaDJNkV6Jbn85xyziY7gOCpKpFsG9oKA/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbxJi_DMG0HpJftAFnS9V1LkAqaTPq9s3pZ08nCKWYwVqC3tcPRUplGB6bxoXrJNUUvP/exec';
 
   function sendToGAS(data) {
     try {
