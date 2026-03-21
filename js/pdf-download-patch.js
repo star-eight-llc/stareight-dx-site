@@ -95,14 +95,15 @@
       window.__diagScore = data.totalPct;
       window.__diagLevel = data.level;
 
-      // GASへGETリクエストで送信（CORSの制約を回避）
+      // GASへGETリクエストで送信（fetchでリダイレクトに対応）
       var params = Object.keys(payload).map(function(k) {
         return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]);
       }).join('&');
 
-      var img = new Image();
-      img.src = GAS_URL + '?' + params;
-      img.onerror = function() {}; // エラーは無視
+      fetch(GAS_URL + '?' + params, {
+        method: 'GET',
+        mode: 'no-cors'
+      }).catch(function() {});
 
       console.log('DX診断データ送信完了: ' + diagId);
     } catch (e) {
