@@ -88,13 +88,13 @@
         </div>
 
         <div class="form-group">
-          <label>電話番号</label>
+          <label>電話番号 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">※任意</span></label>
           <input type="tel" name="phone" placeholder="例：03-1234-5678">
         </div>
 
         <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
           <div class="form-group">
-            <label>業種</label>
+            <label>業種 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">※任意</span></label>
             <select name="industry">
               <option value="">選択してください</option>
               <option value="製造業">製造業</option>
@@ -110,7 +110,7 @@
             </select>
           </div>
           <div class="form-group">
-            <label>従業員数</label>
+            <label>従業員数 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">※任意</span></label>
             <select name="employees">
               <option value="">選択してください</option>
               <option value="1-5名">1〜5名</option>
@@ -123,7 +123,7 @@
         </div>
 
         <div class="form-group">
-          <label>DXへの年間予算感</label>
+          <label>DXへの年間予算感 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">※任意</span></label>
           <select name="budget">
             <option value="">選択してください</option>
             <option value="まだ未定">まだ未定・これから検討</option>
@@ -135,7 +135,7 @@
         </div>
 
         <div class="form-group">
-          <label>お問い合わせ内容</label>
+          <label>お問い合わせ内容 <span style="font-size:12px;color:var(--gray-400);font-weight:400;">※任意</span></label>
           <textarea name="message" id="formMessage" rows="5" placeholder="ご質問やご相談の内容をご記入ください。&#10;無料相談の場合は、ご希望の日時や相談内容を簡単にお書きいただけると助かります。"></textarea>
         </div>
 
@@ -166,7 +166,7 @@
     </div>
 
     <div style="text-align:center; margin-top:32px; color:var(--gray-500); font-size:14px;">
-      <p>メールでのお問い合わせ：<a href="mailto:star.eight.llc@gmail.com">star.eight.llc@gmail.com</a></p>
+      <p>メールでのお問い合わせ：<a href="/cdn-cgi/l/email-protection#89fafde8fba7ece0eee1fda7e5e5eac9eee4e8e0e5a7eae6e4"><span class="__cf_email__" data-cfemail="7a090e1b08541f131d120e541616193a1d171b131654191517">[email&#160;protected]</span></a></p>
     </div>
   </div>
 </section>
@@ -191,7 +191,7 @@
   </div>
 </footer>
 
-<script src="js/main.js"></script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script src="js/main.js"></script>
 <script>
 (function() {
   var params = new URLSearchParams(window.location.search);
@@ -253,11 +253,4 @@
   if (top3) {
     var t3 = top3.split(',');
     var h = '<div style="padding:12px 20px;background:#fff;border-radius:8px;flex:1;">' +
-      '<div style="font-size:12px;color:#888;margin-bottom:4px;">優先改善カテゴリ</div>';
-    t3.forEach(function(n,i) { h += '<div style="font-size:13px;color:#1a5276;margin-bottom:2px;">'+(i+1)+'. '+n+'</div>'; });
-    summaryEl.innerHTML += h + '</div>';
-  }
-})();
-</script>
-</body>
-</html>
+      '<div style="font-size:12px;color:#888;marg
