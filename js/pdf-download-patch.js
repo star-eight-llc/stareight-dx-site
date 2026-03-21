@@ -95,16 +95,29 @@
       window.__diagScore = data.totalPct;
       window.__diagLevel = data.level;
 
-      // GASへGETリクエストで送信（隠しiframeでリダイレクトを確実に追従）
-      var params = Object.keys(payload).map(function(k) {
-        return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]);
-      }).join('&');
-
+      // GASへ送信（隠しフォームPOSTで確実に送信）
       var iframe = document.createElement('iframe');
+      iframe.name = '__gasFrame';
       iframe.style.display = 'none';
-      iframe.src = GAS_URL + '?' + params;
       document.body.appendChild(iframe);
-      setTimeout(function() { iframe.remove(); }, 10000);
+
+      var form = document.createElement('form');
+      form.method = 'POST';
+      form.action = GAS_URL;
+      form.target = '__gasFrame';
+      form.style.display = 'none';
+
+      Object.keys(payload).forEach(function(k) {
+        var input = document.createElement('input');
+        input.type = 'hidden';
+        input.name = k;
+        input.value = payload[k];
+        form.appendChild(input);
+      });
+
+      document.body.appendChild(form);
+      form.submit();
+      setTimeout(function() { form.remove(); iframe.remove(); }, 10000);
 
       console.log('DX診断データ送信完了: ' + diagId);
     } catch (e) {
