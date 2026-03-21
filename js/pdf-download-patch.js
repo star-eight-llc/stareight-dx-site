@@ -50,7 +50,7 @@
   };
 
   // ====== GASスプレッドシートに診断結果を送信 ======
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbxPoxAIh_9lQby2V0MeRmhh6Ene4AfKQ1hhVNpaDJNkV6Jbn85xyziY7gOCpKpFsG9oKA/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbzT3UeeviH1sFrpQpd0pO8beDCVDeHYOMqu5dcshW5Q7DOouXAuGVsPI8RbGpLB-5Drzw/exec';
 
   function sendToGAS(data) {
     try {
@@ -68,13 +68,24 @@
         return (i + 1) + '.' + c.name + '(' + c.pct + '点)';
       }).join(', ');
 
+      // カテゴリ別スコアを個別フィールドとして構築
+      var catFields = {};
+      data.catScores.forEach(function(c) {
+        catFields[c.name] = c.pct + '点';
+      });
+
       var payload = {
         diagId: diagId,
         timestamp: now.toISOString(),
         score: data.totalPct,
         level: 'Level ' + data.level,
-        levelMsg: data.levelMsg,
-        categories: catScoreStr,
+        cat_業務プロセス: catFields['業務プロセス'] || '',
+        cat_データ管理: catFields['データ管理'] || '',
+        cat_データ活用: catFields['データ活用'] || '',
+        cat_ITツール活用: catFields['ITツール活用'] || '',
+        cat_セキュリティ: catFields['セキュリティ'] || '',
+        cat_AI活用: catFields['AI活用'] || '',
+        cat_DX推進体制: catFields['DX推進体制'] || '',
         top3: top3Str,
         userAgent: navigator.userAgent
       };
