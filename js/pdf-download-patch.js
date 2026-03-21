@@ -301,10 +301,10 @@
     var cx=W/2, lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
     y+=circleR*2+30;
-    if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+data.level,cx,y);}
+    if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
-    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';ctx.fillText(data.levelMsg,cx,y);ctx.textAlign='left';}
-    y+=50;
+    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}
+    y+=30;
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
     data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='15px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 16px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=10; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,10,5);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(10,(c.pct/100)*CW),10,5);ctx.fill();}} y+=30; });
@@ -313,7 +313,30 @@
     y+=32;
     for(var i=0;i<3&&i<data.sorted.length;i++){ var cat=data.sorted[i],actionText=data.actionTexts[cat.name]||''; var cardFont='14px '+FONT,lines=wrapText(ctx,actionText,CW-60,cardFont),cardH=38+lines.length*20+16; if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,cardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,cardH,8);ctx.stroke();ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+8,4,cardH-16);} var ix=PAD+20,iy=y+24; if(!dryRun){ctx.fillStyle='#2980b9';ctx.font='bold 14px '+FONT;ctx.fillText('ACTION '+(i+1)+'：'+cat.icon+' '+cat.name+'（現在 '+cat.pct+'点）',ix,iy);} iy+=22; if(!dryRun){ctx.fillStyle='#555';ctx.font=cardFont;lines.forEach(function(l){ctx.fillText(l,ix,iy);iy+=20;});} y+=cardH+14; }
     y+=30;
-    if(!dryRun){ctx.fillStyle='#1a5276';roundRect(ctx,PAD,y,CW,80,10);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 17px '+FONT;ctx.textAlign='center';ctx.fillText('この診断結果をもとに、具体的な改善プランを無料でご提案します',cx,y+32);ctx.fillStyle='#b0d4f1';ctx.font='13px '+FONT;ctx.fillText('スターエイトのDXコンサルタントが、御社の状況に合わせた改善計画を策定します。',cx,y+54);ctx.fillStyle='#fff';ctx.font='12px '+FONT;ctx.fillText('https://stareight-dx-site.pages.dev/contact.html',cx,y+72);ctx.textAlign='left';}
+    // ====== 御社の課題に対応しやすい支援例 TOP3 ======
+    if(data.svcTop3 && data.svcTop3.length > 0){
+      if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('御社の課題に対応しやすい支援例 TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,340,3);}
+      y+=32;
+      var svcDescs={"Excel業務改善":"Excelの集計・転記・レポート作成など、手作業の多い業務を効率化したい会社向けです。","データ可視化":"売上・利益・KPIなどの数字を見える化し、経営判断をしやすくしたい会社向けです。","データ分析":"売上や顧客データを分析し、改善アクションにつなげたい会社向けです。","生成AI活用支援":"ChatGPTやClaudeなどの生成AIを、実際の業務で使える形にしたい会社向けです。","DX改善プラン策定":"課題が複数にまたがっていて、何から始めるべきか整理したい会社向けです。","DX顧問":"継続的にDXを進めたいが、社内だけでは進めにくい会社向けです。"};
+      for(var si=0;si<3&&si<data.svcTop3.length;si++){
+        var sv=data.svcTop3[si];
+        var degLabel=sv.avg>=1.2?'課題度：高':sv.avg>=0.6?'課題度：中':'課題度：低';
+        var degColor=sv.avg>=1.2?'#CC4444':sv.avg>=0.6?'#E67E22':'#2D8B57';
+        var svDesc=svcDescs[sv.name]||'';
+        var svFont='14px '+FONT,svLines=wrapText(ctx,svDesc,CW-60,svFont);
+        var svCardH=38+svLines.length*20+16;
+        if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,svCardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,svCardH,8);ctx.stroke();ctx.fillStyle=degColor;ctx.fillRect(PAD,y+8,4,svCardH-16);}
+        var sx=PAD+20,sy=y+24;
+        if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 15px '+FONT;ctx.fillText((si+1)+'. '+sv.name,sx,sy);ctx.fillStyle=degColor;ctx.font='bold 12px '+FONT;ctx.textAlign='right';ctx.fillText(degLabel,W-PAD-16,sy);ctx.textAlign='left';}
+        sy+=22;
+        if(!dryRun){ctx.fillStyle='#555';ctx.font=svFont;svLines.forEach(function(l){ctx.fillText(l,sx,sy);sy+=20;});}
+        y+=svCardH+14;
+      }
+      y+=10;
+      if(!dryRun){ctx.fillStyle='#aaa';ctx.font='11px '+FONT;ctx.fillText('※上記は診断結果をもとにした一般的なご提案です。実際の進め方は、業種や業務内容に応じて異なります。',PAD,y);}
+      y+=30;
+    }
+    if(!dryRun){ctx.fillStyle='#1a5276';roundRect(ctx,PAD,y,CW,80,10);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 17px '+FONT;ctx.textAlign='center';ctx.fillText('診断結果をもとに、何から始めるべきか整理しませんか？',cx,y+32);ctx.fillStyle='#b0d4f1';ctx.font='13px '+FONT;ctx.fillText('スターエイトでは、診断結果をふまえて、優先順位と次の一歩を一緒に整理します。',cx,y+54);ctx.fillStyle='#fff';ctx.font='12px '+FONT;ctx.fillText('https://stareight-dx-site.pages.dev/contact.html',cx,y+72);ctx.textAlign='left';}
     y+=110;
     if(!dryRun){ctx.fillStyle='#bbb';ctx.font='11px '+FONT;ctx.textAlign='center';ctx.fillText('© 2026 StarEight LLC. All rights reserved.',cx,y);ctx.textAlign='left';}
     y+=30; return y;
