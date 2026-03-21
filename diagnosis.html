@@ -6,6 +6,9 @@
 <title>無料DX診断 | スターエイト DXコンサルティング</title>
 <meta name="description" content="5分で御社のDXレベルを診断。7カテゴリ別のスコアと具体的な改善アクションがわかります。">
 <link rel="stylesheet" href="css/style.css">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-70X6QJZSQX"></script>
+<script src="js/ga4-events.js"></script>
 </head>
 <body>
 <header class="site-header">
@@ -160,7 +163,9 @@ function startDiagnosis() {
   document.getElementById('diag-questions').style.display = 'block';
   answers = new Array(allQuestions.length).fill(-1);
   currentQ = 0;
+  window._diagStartTime = Date.now();
   renderQuestion();
+  if (typeof ga4DiagStart === 'function') ga4DiagStart();
 }
 
 function renderQuestion() {
@@ -361,6 +366,17 @@ function showResults() {
   html += '</div>';
   document.getElementById('diag-results').innerHTML = html;
   window.scrollTo({top: 0, behavior: 'smooth'});
+
+  // GA4: 診断完了イベント
+  if (typeof ga4DiagComplete === 'function') ga4DiagComplete(totalPct, levelName, window.__diagId || '');
+
+  // GA4: CTAクリック計測（無料相談ボタン）
+  var ctaLinks = document.querySelectorAll('#diag-results a[href*="contact"]');
+  ctaLinks.forEach(function(a) {
+    a.addEventListener('click', function() {
+      if (typeof ga4ContactClick === 'function') ga4ContactClick('diagnosis_result', totalPct);
+    });
+  });
 }
 </script>
 <script src="js/pdf-download-patch.js"></script>
