@@ -253,4 +253,12 @@
   if (top3) {
     var t3 = top3.split(',');
     var h = '<div style="padding:12px 20px;background:#fff;border-radius:8px;flex:1;">' +
-      '<div style="font-size:12px;color:#888;marg
+      '<div style="font-size:12px;color:#888;margin-bottom:6px;">改善優先カテゴリ</div>';
+    t3.forEach(function(t, i) { h += '<div style="font-size:13px;color:#1a5276;">' + (i+1) + '. ' + t + '</div>'; });
+    h += '</div>';
+    summaryEl.innerHTML += h;
+  }
+})();
+</script>
+</body>
+</html>
