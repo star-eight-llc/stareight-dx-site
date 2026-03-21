@@ -56,14 +56,14 @@
     </div>
 
     <!-- フォーム（通常のFormspree POST送信） -->
-    <div class="card">
+    <div class="card" id="formCard">
       <form action="https://formspree.io/f/mbdzaaaa" method="POST" id="contactForm">
         <div class="form-group">
           <label>お問い合わせ種別 <span style="color:#CC4444;">*</span></label>
           <select name="type" id="formType" required>
             <option value="">選択してください</option>
             <option value="DX診断結果をもとに無料相談">📊 DX診断結果をもとに無料相談</option>
-            <option value="無料相談の申込み">★ 無料相談の申込み（30分・オンライン可）</option>
+            <option value="無料相談の申込み">★ 無料相談の申込み（60分・オンライン可）</option>
             <option value="無料DX診断の申込み">無料DX診断の申込み</option>
             <option value="サービスについての質問">サービスについての質問</option>
             <option value="DX顧問の相談">DX顧問の相談</option>
@@ -155,14 +155,14 @@
           ※ 通常1営業日以内にご返信いたします。
         </p>
       </form>
+    </div>
 
-      <!-- 送信完了メッセージ -->
-      <div id="successMsg" style="display:none; text-align:center; padding:40px 20px;">
-        <div style="font-size:48px; margin-bottom:16px;">✅</div>
-        <h3 style="font-size:20px; color:#2D8B57; margin-bottom:8px;">送信完了しました</h3>
-        <p style="color:var(--gray-500);">通常1営業日以内にご返信いたします。<br>しばらくお待ちください。</p>
-        <a href="index.html" class="btn btn-outline" style="margin-top:16px;">トップページに戻る</a>
-      </div>
+    <!-- 送信完了メッセージ（送信前は完全に非表示） -->
+    <div id="successMsg" class="card" style="display:none; text-align:center; padding:48px 24px;">
+      <div style="font-size:48px; margin-bottom:16px;">✅</div>
+      <h3 style="font-size:20px; color:#2D8B57; margin-bottom:8px;">送信完了しました</h3>
+      <p style="color:var(--gray-500);">通常1営業日以内にご返信いたします。<br>しばらくお待ちください。</p>
+      <a href="index.html" class="btn btn-outline" style="margin-top:16px;">トップページに戻る</a>
     </div>
 
     <div style="text-align:center; margin-top:32px; color:var(--gray-500); font-size:14px;">
@@ -198,7 +198,7 @@
 
   // ====== 送信完了後のリダイレクト処理 ======
   if (params.get('sent') === '1') {
-    document.getElementById('contactForm').style.display = 'none';
+    document.getElementById('formCard').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
     return;
   }
