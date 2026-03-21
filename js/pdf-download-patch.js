@@ -41,9 +41,64 @@
       catScores: catScores, sorted: sorted, actionTexts: actionTexts
     };
     _orig.apply(this, arguments);
+
+    // ====== GASスプレッドシートに診断結果を自動送信 ======
+    sendToGAS(_resultData);
+
     rewriteCtaLink();
     injectPdfButton();
   };
+
+  // ====== GASスプレッドシートに診断結果を送信 ======
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbxPoxAIh_9lQby2V0MeRmhh6Ene4AfKQ1hhVNpaDJNkV6Jbn85xyziY7gOCpKpFsG9oKA/exec';
+
+  function sendToGAS(data) {
+    try {
+      var now = new Date();
+      var diagId = 'DX-' + now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + '-' +
+        String(Math.floor(Math.random() * 10000)).padStart(4, '0');
+
+      var catScoreStr = data.catScores.map(function(c) {
+        return c.name + ':' + c.pct + '点';
+      }).join(', ');
+
+      var top3Str = data.sorted.slice(0, 3).map(function(c, i) {
+        return (i + 1) + '.' + c.name + '(' + c.pct + '点)';
+      }).join(', ');
+
+      var payload = {
+        diagId: diagId,
+        timestamp: now.toISOString(),
+        score: data.totalPct,
+        level: 'Level ' + data.level,
+        levelMsg: data.levelMsg,
+        categories: catScoreStr,
+        top3: top3Str,
+        userAgent: navigator.userAgent
+      };
+
+      // diagIdをページに保存（contact.htmlで参照可能にする）
+      window.__diagId = diagId;
+      window.__diagScore = data.totalPct;
+      window.__diagLevel = data.level;
+
+      // バックグラウンド送信（no-corsでGASへPOST）
+      fetch(GAS_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
+      }).catch(function(err) {
+        console.log('GAS送信エラー（無視可）:', err);
+      });
+
+      console.log('DX診断データ送信完了: ' + diagId);
+    } catch (e) {
+      console.log('GAS送信スキップ:', e);
+    }
+  }
 
   // ====== CTAリンクに診断データを付与 ======
   function rewriteCtaLink() {
