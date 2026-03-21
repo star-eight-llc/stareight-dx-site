@@ -8,6 +8,16 @@
   var _resultData = null;
   var _jspdfLoaded = false;
   var _orig = window.showResults;
+  var _diagStartTime = null;
+
+  // 診断開始時刻を記録
+  var _origStart = window.startDiagnosis;
+  if (typeof _origStart === 'function') {
+    window.startDiagnosis = function() {
+      _diagStartTime = new Date();
+      _origStart.apply(this, arguments);
+    };
+  }
 
   window.showResults = function() {
     var catScores = categories.map(function(cat, ci) {
