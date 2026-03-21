@@ -174,12 +174,16 @@
     var d = _resultData;
     var params = new URLSearchParams();
     params.set('from', 'diagnosis');
+    params.set('diagId', window.__diagId || '');
     params.set('score', d.totalPct);
-    params.set('level', d.level);
+    params.set('level', d.levelName || d.level);
     params.set('cats', d.catScores.map(function(c) { return c.name + ':' + c.pct; }).join(','));
     params.set('top3', d.sorted.slice(0, 3).map(function(c) { return c.name; }).join(','));
+    if (d.svcTop3) {
+      params.set('svcTop3', d.svcTop3.map(function(s) { return s.name; }).join(','));
+    }
     var contactUrl = 'contact.html?' + params.toString();
-    results.querySelectorAll('a[href="contact.html"]').forEach(function(a) { a.href = contactUrl; });
+    results.querySelectorAll('a[href*="contact.html"]').forEach(function(a) { a.href = contactUrl; });
   }
 
   // ====== PDFダウンロードボタン ======
@@ -245,6 +249,8 @@
           btn.innerHTML = '✓ ダウンロード完了！';
           btn.style.background = 'linear-gradient(135deg,#27ae60 0%,#2ecc71 100%)'; btn.style.opacity = '1';
           setTimeout(function() { btn.innerHTML = origHTML; btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)'; btn.disabled = false; }, 2500);
+          // GA4: PDFダウンロードイベント
+          if (typeof ga4PdfDownload === 'function') ga4PdfDownload(_resultData.totalPct, _resultData.levelName || _resultData.level);
         } catch (e) {
           console.error('PDF error:', e); alert('PDF生成エラー: ' + e.message);
           btn.innerHTML = origHTML; btn.style.background = 'linear-gradient(135deg,#1a5276 0%,#2980b9 100%)'; btn.style.opacity = '1'; btn.disabled = false;
