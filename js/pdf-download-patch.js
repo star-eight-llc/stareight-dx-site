@@ -50,7 +50,7 @@
   };
 
   // ====== GASスプレッドシートに診断結果を送信 ======
-  var GAS_URL = 'https://script.google.com/macros/s/AKfycbzT3UeeviH1sFrpQpd0pO8beDCVDeHYOMqu5dcshW5Q7DOouXAuGVsPI8RbGpLB-5Drzw/exec';
+  var GAS_URL = 'https://script.google.com/macros/s/AKfycbxPoxAIh_9lQby2V0MeRmhh6Ene4AfKQ1hhVNpaDJNkV6Jbn85xyziY7gOCpKpFsG9oKA/exec';
 
   function sendToGAS(data) {
     try {
@@ -95,15 +95,14 @@
       window.__diagScore = data.totalPct;
       window.__diagLevel = data.level;
 
-      // バックグラウンド送信（no-corsでGASへPOST）
-      fetch(GAS_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
-      }).catch(function(err) {
-        console.log('GAS送信エラー（無視可）:', err);
-      });
+      // GASへGETリクエストで送信（CORSの制約を回避）
+      var params = Object.keys(payload).map(function(k) {
+        return encodeURIComponent(k) + '=' + encodeURIComponent(payload[k]);
+      }).join('&');
+
+      var img = new Image();
+      img.src = GAS_URL + '?' + params;
+      img.onerror = function() {}; // エラーは無視
 
       console.log('DX診断データ送信完了: ' + diagId);
     } catch (e) {
