@@ -6,6 +6,9 @@
 <title>無料相談・お問い合わせ | スターエイト DXコンサルティング</title>
 <meta name="description" content="DXの無料相談・お問い合わせはこちら。30分のオンライン面談で、御社のDX課題を整理します。">
 <link rel="stylesheet" href="css/style.css">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-70X6QJZSQX"></script>
+<script src="js/ga4-events.js"></script>
 </head>
 <body>
 <header class="site-header">
@@ -200,6 +203,7 @@
   if (params.get('sent') === '1') {
     document.getElementById('formCard').style.display = 'none';
     document.getElementById('successMsg').style.display = 'block';
+    if (typeof ga4FormSubmit === 'function') ga4FormSubmit('contact_form');
     return;
   }
 
