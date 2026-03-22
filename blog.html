@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブログ・コラム | スターエイト合同会社 - 中小企業DX支援</title>
+<meta name="description" content="データサイエンティストが中小企業のDX・Excel改善・データ分析・AI活用について、実践的なノウハウをnoteで発信中。">
+<link rel="stylesheet" href="css/style.css">
+
+<!-- GA4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-70X6QJZSQX"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-70X6QJZSQX');</script>
+<script src="js/ga4-events.js" defer></script>
+
+<style>
+/* ===== Blog Page Specific Styles ===== */
+.blog-hero {
+  background: linear-gradient(135deg, var(--navy) 0%, #1a365d 100%);
+  padding: 140px 0 80px;
+  text-align: center;
+  color: var(--white);
+}
+.blog-hero .tag { color: #60a5fa; }
+.blog-hero h1 { color: var(--white); margin-bottom: 16px; font-size: clamp(28px,4vw,42px); }
+.blog-hero p { color: var(--gray-300); max-width: 640px; margin: 0 auto; font-size: 16px; line-height: 1.8; }
+
+/* Note CTA Banner */
+.note-banner {
+  background: linear-gradient(135deg, #41c9b4 0%, #2D8B57 100%);
+  border-radius: var(--radius);
+  padding: 40px;
+  text-align: center;
+  color: var(--white);
+  margin: 48px 0;
+}
+.note-banner h2 { color: var(--white); font-size: 24px; margin-bottom: 12px; }
+.note-banner p { color: rgba(255,255,255,0.9); margin-bottom: 24px; font-size: 15px; }
+.note-banner .btn-note {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--white); color: var(--brand-dark);
+  padding: 14px 32px; border-radius: 50px;
+  font-weight: 700; font-size: 16px;
+  text-decoration: none; transition: var(--transition);
+}
+.note-banner .btn-note:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.2); }
+.note-banner .btn-note svg { width: 20px; height: 20px; }
+
+/* Article Cards */
+.articles-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 24px;
+  margin: 40px 0;
+}
+.article-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius);
+  overflow: hidden;
+  transition: var(--transition);
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  flex-direction: column;
+}
+.article-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+  border-color: var(--brand);
+}
+.article-card-img {
+  width: 100%;
+  aspect-ratio: 16/9;
+  object-fit: cover;
+  background: var(--gray-100);
+}
+.article-card-body {
+  padding: 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.article-card-date {
+  font-size: 13px;
+  color: var(--gray-500);
+  margin-bottom: 8px;
+}
+.article-card-title {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--navy);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.article-card-excerpt {
+  font-size: 14px;
+  color: var(--gray-600);
+  line-height: 1.7;
+  flex: 1;
+}
+.article-card-tag {
+  display: inline-block;
+  background: var(--brand-light);
+  color: var(--brand-dark);
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: 16px;
+  align-self: flex-start;
+}
+.article-card-readmore {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--brand);
+  margin-top: 16px;
+}
+
+/* Mutual Link Section */
+.mutual-links {
+  background: var(--gray-50);
+  border-radius: var(--radius);
+  padding: 40px;
+  margin: 48px 0;
+}
+.mutual-links h3 {
+  text-align: center;
+  margin-bottom: 24px;
+  font-size: 20px;
+}
+.link-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+.link-card {
+  background: var(--white);
+  border: 1px solid var(--gray-200);
+  border-radius: var(--radius-sm);
+  padding: 24px;
+  text-decoration: none;
+  color: inherit;
+  transition: var(--transition);
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+}
+.link-card:hover { border-color: var(--brand); box-shadow: var(--shadow-md); }
+.link-card-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 24px;
+}
+.link-card-icon.green { background: var(--brand-light); }
+.link-card-icon.blue { background: var(--blue-light); }
+.link-card-icon.purple { background: #ede9fe; }
+.link-card h4 { font-size: 15px; margin-bottom: 4px; }
+.link-card p { font-size: 13px; color: var(--gray-500); }
+
+/* Coming soon placeholder */
+.coming-soon {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--gray-400);
+  font-size: 15px;
+}
+.coming-soon-icon { font-size: 48px; margin-bottom: 16px; display: block; }
+</style>
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="star">★</span> StarEight <span class="dx-badge">DX</span></a>
+    <ul class="nav-links">
+      <li><a href="services.html">サービス</a></li>
+      <li><a href="diagnosis.html">無料DX診断</a></li>
+      <li><a href="cases.html">支援内容の具体例</a></li>
+      <li><a href="blog.html" class="active">ブログ</a></li>
+      <li><a href="about.html">代表紹介</a></li>
+      <li><a href="contact.html" class="nav-cta">無料相談・お問い合わせ</a></li>
+    </ul>
+    <button class="hamburger" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="blog-hero">
+  <div class="container">
+    <span class="tag">Blog &amp; Column</span>
+    <h1>ブログ・コラム</h1>
+    <p>データサイエンティストが中小企業のDX・Excel改善・データ分析・AI活用について、実践的なノウハウを発信しています。</p>
+  </div>
+</section>
+
+<!-- NOTE BANNER -->
+<section class="section">
+  <div class="container">
+    <div class="note-banner">
+      <h2>📝 noteで最新記事を配信中</h2>
+      <p>DXの実践ノウハウ、エステ経営×データ活用のリアルストーリー、<br>中小企業のAI活用ガイドなどを定期的に発信しています。フォローで新着通知が届きます。</p>
+      <a href="https://note.com/star_eight_llc" target="_blank" rel="noopener noreferrer" class="btn-note">
+        <svg viewBox="0 0 24 24" fill="currentColor"><path d="M15.147 6.015c.456.012.892.2 1.16.484l3.187 3.187c.26.26.46.716.46 1.16v7.154c0 .9-.72 1.625-1.625 1.625H7.08c-.9 0-1.625-.72-1.625-1.625V7.64c0-.9.72-1.625 1.625-1.625h8.067zM9 10.5v1h6v-1H9zm0 3v1h4v-1H9z"/></svg>
+        noteをフォローする
+      </a>
+    </div>
+
+    <!-- ARTICLES -->
+    <h2 style="text-align:center; margin-bottom:8px;">最新の記事</h2>
+    <p style="text-align:center; color:var(--gray-500); margin-bottom:32px;">noteに公開した記事を一覧でご紹介します</p>
+
+    <div class="articles-grid">
+
+      <!-- Article 1 -->
+      <a href="https://note.com/star_eight_llc/n/n34d8aee6d6c7" target="_blank" rel="noopener noreferrer" class="article-card">
+        <div style="width:100%;aspect-ratio:16/9;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#2D8B57 100%);display:flex;align-items:center;justify-content:center;padding:24px;">
+          <div style="text-align:center;color:#fff;">
+            <div style="font-size:32px;margin-bottom:8px;">📊</div>
+            <div style="font-size:14px;font-weight:700;line-height:1.5;">データサイエンティストが<br>中小企業のDX支援を始めた理由</div>
+          </div>
+        </div>
+        <div class="article-card-body">
+          <div class="article-card-date">2026.03.22</div>
+          <div class="article-card-title">データサイエンティストが中小企業のDX支援を始めた理由</div>
+          <div class="article-card-excerpt">金融業界15年以上のデータ分析経験を持つデータサイエンティストが、なぜ中小企業のDX支援を始めたのか。中小企業DXの「3つの壁」と、スターエイトのアプローチ。無料DX診断ツールの紹介。</div>
+          <span class="article-card-tag">自己紹介・ミッション</span>
+          <div class="article-card-readmore">noteで読む →</div>
+        </div>
+      </a>
+
+      <!-- Placeholder for future articles -->
+      <div class="article-card" style="border-style:dashed;border-color:var(--gray-300);background:var(--gray-50);">
+        <div class="article-card-body" style="justify-content:center;align-items:center;text-align:center;min-height:280px;">
+          <div style="font-size:36px;margin-bottom:12px;">✏️</div>
+          <div class="article-card-title" style="font-size:16px;color:var(--gray-400);">次の記事を準備中</div>
+          <div class="article-card-excerpt" style="color:var(--gray-400);">DX実践ノウハウ、Excel時短術、AI活用ガイドなど、中小企業の経営に役立つ記事を毎週更新予定です。</div>
+          <a href="https://note.com/star_eight_llc" target="_blank" rel="noopener noreferrer" style="color:var(--brand);font-weight:600;font-size:14px;margin-top:16px;text-decoration:none;">noteをフォローして新着通知を受け取る →</a>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- CATEGORY SECTION -->
+    <div class="mutual-links" style="margin-top:64px;">
+      <h3>記事カテゴリ</h3>
+      <div class="link-cards">
+        <div class="link-card" style="cursor:default;">
+          <div class="link-card-icon green">💡</div>
+          <div>
+            <h4>DX実践ノウハウ</h4>
+            <p>Excel時短術、データ可視化、AI活用ガイドなど、すぐに使える実務テクニック</p>
+          </div>
+        </div>
+        <div class="link-card" style="cursor:default;">
+          <div class="link-card-icon blue">📖</div>
+          <div>
+            <h4>経営者ストーリー</h4>
+            <p>エステ経営×DXの実体験、DX診断から見えた中小企業のリアル</p>
+          </div>
+        </div>
+        <div class="link-card" style="cursor:default;">
+          <div class="link-card-icon purple">📋</div>
+          <div>
+            <h4>テンプレート・ツール</h4>
+            <p>月次経営スコアカード、KPIダッシュボード、分析用Excelなど</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div style="text-align:center;margin:64px 0 40px;">
+      <h2 style="margin-bottom:16px;">DXの第一歩を踏み出しませんか？</h2>
+      <p style="color:var(--gray-500);margin-bottom:32px;">まずは5分で御社のDXレベルを可視化。30問の無料診断で「何から始めるべきか」がわかります。</p>
+      <div style="display:flex;gap:16px;justify-content:center;flex-wrap:wrap;">
+        <a href="diagnosis.html" class="btn btn-primary">無料DX診断を受ける →</a>
+        <a href="contact.html" class="btn btn-ghost">無料相談・お問い合わせ →</a>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-brand"><div class="footer-logo"><span class="star">★</span> StarEight DX</div><p>中小企業のDXを、わかりやすく。<br>スターエイト合同会社</p><p style="font-size:12px;color:var(--gray-500);">〒193-0824 東京都八王子市長房町</p>
+        <div style="margin-top:12px;display:flex;gap:12px;">
+          <a href="https://note.com/star_eight_llc" target="_blank" rel="noopener noreferrer" style="color:var(--gray-400);font-size:13px;text-decoration:none;display:flex;align-items:center;gap:4px;">📝 note</a>
+        </div>
+      </div>
+      <div class="footer-links"><h4>サービス</h4><ul><li><a href="services.html">サービス一覧</a></li><li><a href="diagnosis.html">無料DX診断</a></li><li><a href="cases.html">支援内容の具体例</a></li></ul></div>
+      <div class="footer-links"><h4>情報発信</h4><ul><li><a href="blog.html">ブログ・コラム</a></li><li><a href="https://note.com/star_eight_llc" target="_blank" rel="noopener noreferrer">note</a></li></ul></div>
+      <div class="footer-links"><h4>ご相談</h4><ul><li><a href="contact.html">無料相談を予約</a></li><li><a href="about.html">代表紹介</a></li></ul></div>
+    </div>
+    <div class="footer-bottom">&copy; 2026 StarEight LLC. All rights reserved.</div>
+  </div>
+</footer>
+<script src="js/main.js"></script>
+</body>
+</html>
