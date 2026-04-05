@@ -1,7 +1,5 @@
 // ============================================================
-// DX診断結果 PDF + 無料相談連携 v10 — SERVICE 00-09直結版
-// PDF = ダウンロード専用（レーダーチャート付き）
-// GAS = スプレッドシート自動送信
+// DX診断結果 PDF + 無料相談連携 v11 — レーダーチャート修正版
 // ============================================================
 (function() {
   'use strict';
@@ -10,6 +8,7 @@
   var _jspdfLoaded = false;
   var _orig = window.showResults;
   var _diagStartTime = null;
+  var _radarImageData = null; // レーダーチャートのキャプチャ保存用
 
   var _origStart = window.startDiagnosis;
   if (typeof _origStart === 'function') {
@@ -37,7 +36,6 @@
     else if (totalPct >= 40) { level='C'; levelName='改善着手期'; levelMsg='複数のテーマで課題が見られます。ただし、すべてを一度に進める必要はありません。効果が出やすいテーマから順に進めるのがおすすめです。'; }
     else { level='D'; levelName='初期段階'; levelMsg='DXはこれから整備していく段階です。まずは現状の課題を整理し、何から始めるべきかを明確にすることが重要です。'; }
     var sorted = catScores.slice().sort(function(a,b) { return a.pct - b.pct; });
-
     var actionTexts = {
       "業務プロセス・効率化": "→ SERVICE 05（Excel業務改善）で手作業を自動化し、SERVICE 03（AI Manager）で改善タスクを管理しましょう。",
       "Web・オンライン活用": "→ SERVICE 04（Web構築＋アクセス分析）で、低コストで集客できるWebサイトを構築しましょう。",
@@ -47,8 +45,6 @@
       "セキュリティ・IT基盤": "→ SERVICE 04のセキュリティ設定やSERVICE 03（AI Manager）でのアクセス権限管理を整備しましょう。",
       "DX推進体制": "→ SERVICE 02（DX改善プラン策定）で全体を整理し、SERVICE 09（DX顧問）で継続的に伴走しましょう。"
     };
-
-    // SERVICE TOP3
     var svcMap = {
       "SERVICE 02 DX改善プラン策定": [0,4,27,28,29],
       "SERVICE 03 AI Manager": [0,1,4,25,26],
@@ -61,8 +57,7 @@
     };
     var svcRank = [];
     Object.keys(svcMap).forEach(function(name) {
-      var qIdxs = svcMap[name];
-      var issueScore = 0;
+      var qIdxs = svcMap[name]; var issueScore = 0;
       qIdxs.forEach(function(qi) { issueScore += (2 - (answers[qi] || 0)); });
       svcRank.push({ name: name, avg: issueScore / qIdxs.length, count: qIdxs.length });
     });
@@ -74,7 +69,17 @@
       catScores: catScores, sorted: sorted, actionTexts: actionTexts,
       svcTop3: svcTop3, allAnswers: answers.slice()
     };
+
     _orig.apply(this, arguments);
+
+    // レーダーチャートが描画された後にキャプチャ（500ms待ち）
+    setTimeout(function() {
+      try {
+        var rc = document.getElementById('radarChart');
+        if (rc) { _radarImageData = rc.toDataURL('image/png'); }
+      } catch(e) { console.log('radar capture:', e); }
+    }, 500);
+
     sendToGAS(_resultData);
     rewriteCtaLink();
     injectPdfButton();
@@ -86,11 +91,7 @@
   function sendToGAS(data) {
     try {
       var now = new Date();
-      var diagId = 'DX-' + now.getFullYear() +
-        String(now.getMonth()+1).padStart(2,'0') +
-        String(now.getDate()).padStart(2,'0') + '-' +
-        String(Math.floor(Math.random()*10000)).padStart(4,'0');
-
+      var diagId = 'DX-' + now.getFullYear() + String(now.getMonth()+1).padStart(2,'0') + String(now.getDate()).padStart(2,'0') + '-' + String(Math.floor(Math.random()*10000)).padStart(4,'0');
       var catFields = {};
       data.catScores.forEach(function(c) { catFields[c.name] = c.pct + '点'; });
       var top3Str = data.sorted.slice(0,3).map(function(c,i) { return (i+1)+'.'+c.name+'('+c.pct+'点)'; }).join(', ');
@@ -121,38 +122,28 @@
         answers_all: (data.allAnswers || []).join(','),
         userAgent: navigator.userAgent
       };
-
-      window.__diagId = diagId;
-      window.__diagScore = data.totalPct;
-      window.__diagLevel = data.level;
+      window.__diagId = diagId; window.__diagScore = data.totalPct; window.__diagLevel = data.level;
 
       var iframe = document.createElement('iframe');
-      iframe.name = '__gasFrame'; iframe.style.display = 'none';
-      document.body.appendChild(iframe);
+      iframe.name = '__gasFrame'; iframe.style.display = 'none'; document.body.appendChild(iframe);
       var form = document.createElement('form');
       form.method = 'POST'; form.action = GAS_URL; form.target = '__gasFrame'; form.style.display = 'none';
       Object.keys(payload).forEach(function(k) {
-        var input = document.createElement('input');
-        input.type = 'hidden'; input.name = k; input.value = payload[k];
-        form.appendChild(input);
+        var input = document.createElement('input'); input.type = 'hidden'; input.name = k; input.value = payload[k]; form.appendChild(input);
       });
-      document.body.appendChild(form);
-      form.submit();
+      document.body.appendChild(form); form.submit();
       setTimeout(function() { form.remove(); iframe.remove(); }, 10000);
       console.log('DX診断データ送信完了: ' + diagId);
     } catch (e) { console.log('GAS送信スキップ:', e); }
   }
 
-  // ====== CTAリンク ======
   function rewriteCtaLink() {
     var results = document.getElementById('diag-results');
     if (!results || !_resultData) return;
     var d = _resultData;
     var params = new URLSearchParams();
-    params.set('from', 'diagnosis');
-    params.set('diagId', window.__diagId || '');
-    params.set('score', d.totalPct);
-    params.set('level', d.levelName || d.level);
+    params.set('from', 'diagnosis'); params.set('diagId', window.__diagId || '');
+    params.set('score', d.totalPct); params.set('level', d.levelName || d.level);
     params.set('cats', d.catScores.map(function(c) { return c.name + ':' + c.pct; }).join(','));
     params.set('top3', d.sorted.slice(0,3).map(function(c) { return c.name; }).join(','));
     if (d.svcTop3) params.set('svcTop3', d.svcTop3.map(function(s) { return s.name; }).join(','));
@@ -160,7 +151,6 @@
     results.querySelectorAll('a[href*="contact.html"]').forEach(function(a) { a.href = contactUrl; });
   }
 
-  // ====== PDFボタン ======
   function injectPdfButton() {
     var results = document.getElementById('diag-results');
     if (!results || document.getElementById('pdfDownloadBtn')) return;
@@ -204,10 +194,8 @@
         try {
           var blob = buildPdfBlob();
           var url = URL.createObjectURL(blob);
-          var a = document.createElement('a');
-          var d = new Date();
-          a.href = url;
-          a.download = 'DX_Diagnosis_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.pdf';
+          var a = document.createElement('a'); var d = new Date();
+          a.href = url; a.download = 'DX_Diagnosis_' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0') + '.pdf';
           a.click(); URL.revokeObjectURL(url);
           btn.innerHTML = '✓ ダウンロード完了！';
           btn.style.background = 'linear-gradient(135deg,#27ae60 0%,#2ecc71 100%)'; btn.style.opacity = '1';
@@ -221,7 +209,6 @@
     });
   }
 
-  // ====== PDF Blob生成（レーダーチャート付き） ======
   function buildPdfBlob() {
     var data = _resultData;
     var d = new Date();
@@ -260,53 +247,47 @@
     return pdf.output('blob');
   }
 
-  // ====== Canvas描画（レーダーチャート付き） ======
+  // ====== Canvas描画 ======
   function drawContent(ctx, W, data, dateStr, dryRun) {
     var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
-    var PAD = 50, CW = W - PAD * 2, y = 0, headerH = 90;
+    var PAD = 50, CW = W - PAD * 2, y = 0, cx = W / 2, headerH = 90;
     if (!dryRun) { ctx.fillStyle='#1a5276'; ctx.fillRect(0,0,W,headerH); ctx.fillStyle='#fff'; ctx.font='bold 15px '+FONT; ctx.fillText('★ StarEight DX Consulting',PAD,35); ctx.font='bold 26px '+FONT; ctx.fillText('DX診断レポート',PAD,65); ctx.font='13px '+FONT; ctx.textAlign='right'; ctx.fillText('診断日：'+dateStr,W-PAD,65); ctx.textAlign='left'; }
     y=headerH+50;
-    var cx=W/2, lc=getLevelHex(data.level), circleR=62;
+    var lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
     y+=circleR*2+35;
     if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
-    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}
+    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}else{var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);y+=lvLines.length*20;}
     y+=30;
 
-    // ====== レーダーチャート（ブラウザCanvasをキャプチャ） ======
-    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}
-    y+=30;
-    var radarH = 300;
+    // ====== レーダーチャート ======
+    var RADAR_H = 320;
     if(!dryRun){
-      // ブラウザ上のradarChartキャンバスをキャプチャして埋め込む
-      var browserRadar = document.getElementById('radarChart');
-      if(browserRadar){
+      ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';
+      ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);
+      ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);
+    }
+    y+=30;
+
+    if(!dryRun){
+      // 方法1: キャプチャ済み画像があれば使う
+      if(_radarImageData){
         try{
-          var radarW = 300;
-          var radarX = cx - radarW/2;
-          ctx.drawImage(browserRadar, radarX, y, radarW, radarW);
-          radarH = radarW + 20;
-        }catch(e){
-          console.log('radar capture error, falling back to manual draw:', e);
-          // フォールバック：手動描画
-          var radarCx=cx, radarCy=y+130, radarR=110, n=data.catScores.length;
-          var angleStep=(2*Math.PI)/n, startAngle=-Math.PI/2;
-          for(var g=1;g<=5;g++){var r=radarR*(g/5);ctx.beginPath();for(var i=0;i<=n;i++){var a=startAngle+i*angleStep;var px=radarCx+r*Math.cos(a);var py=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;ctx.beginPath();ctx.moveTo(radarCx,radarCy);ctx.lineTo(radarCx+radarR*Math.cos(a),radarCy+radarR*Math.sin(a));ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-          ctx.beginPath();for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.lineTo(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a));}ctx.closePath();ctx.fillStyle='rgba(45,139,87,0.2)';ctx.fill();ctx.strokeStyle='#2D8B57';ctx.lineWidth=2;ctx.stroke();
-          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.beginPath();ctx.arc(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#2D8B57';ctx.fill();}
-          ctx.textAlign='center';var sn=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
-          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(sn[i],radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+18);}
-          ctx.textAlign='left';
-          radarH = 300;
-        }
+          var img = new Image();
+          img.src = _radarImageData;
+          var rSize = 280;
+          ctx.drawImage(img, cx - rSize/2, y, rSize, rSize);
+        }catch(e){console.log('radar img err, using fallback',e); drawRadarDirect(ctx,cx,y,data);}
+      } else {
+        // 方法2: 直接描画
+        drawRadarDirect(ctx,cx,y,data);
       }
     }
-    y+=radarH;
+    y += RADAR_H;
 
     // カテゴリ別バー
-    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
+    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
     data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='15px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 16px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=10; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,10,5);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(10,(c.pct/100)*CW),10,5);ctx.fill();}} y+=14;if(!dryRun){ctx.fillStyle='#aaa';ctx.font='10px '+FONT;ctx.fillText('対応SERVICE：'+c.service,PAD,y);}y+=24; });
     y+=25;
@@ -339,23 +320,10 @@
     if(data.svcTop3 && data.svcTop3.length > 0){
       if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('御社におすすめのスターエイト SERVICE TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,380,3);}
       y+=32;
-      var svcDescs={
-        "SERVICE 02 DX改善プラン策定":"課題が複数にまたがっており、まず全体の整理が必要です。90日ロードマップで優先順位と実行計画を策定します。",
-        "SERVICE 03 AI Manager":"タスク管理・進捗管理が必要です。AI搭載の業務管理SaaSで改善タスクの実行を確実にします。",
-        "SERVICE 04 Web構築＋分析":"Webサイトの活用度に改善余地があります。低コストで高品質なサイト構築＋GA4分析を提供します。",
-        "SERVICE 05 Excel業務改善":"Excel集計・転記に手作業が多く残っています。VBA/Python/GASで自動化し大幅な時間短縮を実現します。",
-        "SERVICE 06 データ可視化":"経営数値をタイムリーに把握する仕組みが不足しています。KPIダッシュボードを構築します。",
-        "SERVICE 07 データ分析":"データはあるが分析・活用が進んでいません。2〜4週間のスプリント型で答えを出します。",
-        "SERVICE 08 生成AI活用支援":"AI活用がまだ初期段階です。自社ローカルAI（データ外部送信ゼロ）で業務フローにAIを組み込みます。",
-        "SERVICE 09 DX顧問":"DX推進の体制が不足しています。月次の固定納品物＋チケット制で継続的にDXを伴走します。"
-      };
+      var svcDescs={"SERVICE 02 DX改善プラン策定":"課題が複数にまたがっており、まず全体の整理が必要です。","SERVICE 03 AI Manager":"タスク管理・進捗管理が必要です。AI搭載の業務管理SaaSで改善タスクの実行を確実にします。","SERVICE 04 Web構築＋分析":"Webサイトの活用度に改善余地があります。低コストで高品質なサイト構築＋GA4分析を提供します。","SERVICE 05 Excel業務改善":"Excel集計・転記に手作業が多く残っています。VBA/Python/GASで自動化し大幅な時間短縮を実現します。","SERVICE 06 データ可視化":"経営数値をタイムリーに把握する仕組みが不足しています。KPIダッシュボードを構築します。","SERVICE 07 データ分析":"データはあるが分析・活用が進んでいません。2〜4週間のスプリント型で答えを出します。","SERVICE 08 生成AI活用支援":"AI活用がまだ初期段階です。自社ローカルAI（データ外部送信ゼロ）で業務フローにAIを組み込みます。","SERVICE 09 DX顧問":"DX推進の体制が不足しています。月次の固定納品物＋チケット制で継続的にDXを伴走します。"};
       for(var si=0;si<3&&si<data.svcTop3.length;si++){
-        var sv=data.svcTop3[si];
-        var degLabel=sv.avg>=1.2?'課題度：高':sv.avg>=0.6?'課題度：中':'課題度：低';
-        var degColor=sv.avg>=1.2?'#CC4444':sv.avg>=0.6?'#E67E22':'#2D8B57';
-        var svDesc=svcDescs[sv.name]||'';
-        var svFont='14px '+FONT,svLines=wrapText(ctx,svDesc,CW-60,svFont);
-        var svCardH=38+svLines.length*20+16;
+        var sv=data.svcTop3[si];var degLabel=sv.avg>=1.2?'課題度：高':sv.avg>=0.6?'課題度：中':'課題度：低';var degColor=sv.avg>=1.2?'#CC4444':sv.avg>=0.6?'#E67E22':'#2D8B57';
+        var svDesc=svcDescs[sv.name]||'';var svFont='14px '+FONT,svLines=wrapText(ctx,svDesc,CW-60,svFont);var svCardH=38+svLines.length*20+16;
         if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,svCardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,svCardH,8);ctx.stroke();ctx.fillStyle=degColor;ctx.fillRect(PAD,y+8,4,svCardH-16);}
         var sx=PAD+20,sy=y+24;
         if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 15px '+FONT;ctx.fillText((si+1)+'. '+sv.name,sx,sy);ctx.fillStyle=degColor;ctx.font='bold 12px '+FONT;ctx.textAlign='right';ctx.fillText(degLabel,W-PAD-16,sy);ctx.textAlign='left';}
@@ -367,12 +335,31 @@
       if(!dryRun){ctx.fillStyle='#aaa';ctx.font='11px '+FONT;ctx.fillText('※上記は診断結果をもとにした一般的なご提案です。実際の進め方は無料相談で詳しくお伺いします。',PAD,y);}
       y+=30;
     }
-
     // CTA
     if(!dryRun){ctx.fillStyle='#1a5276';roundRect(ctx,PAD,y,CW,90,10);ctx.fill();ctx.fillStyle='#fff';ctx.font='bold 17px '+FONT;ctx.textAlign='center';ctx.fillText('次のステップ：SERVICE 02「DX改善プラン策定」',cx,y+30);ctx.fillStyle='#b0d4f1';ctx.font='13px '+FONT;ctx.fillText('診断結果をもとに、90日間のDX改善ロードマップを作成します。',cx,y+52);ctx.fillStyle='#fff';ctx.font='12px '+FONT;ctx.fillText('https://stareight-dx.com/contact.html',cx,y+74);ctx.textAlign='left';}
     y+=120;
     if(!dryRun){ctx.fillStyle='#bbb';ctx.font='11px '+FONT;ctx.textAlign='center';ctx.fillText('© 2026 StarEight LLC. All rights reserved.',cx,y);ctx.textAlign='left';}
     y+=30; return y;
+  }
+
+  // レーダーチャート直接描画（フォールバック）
+  function drawRadarDirect(ctx, cx, startY, data) {
+    var FONT = '"Noto Sans JP","Hiragino Sans","Meiryo",sans-serif';
+    var radarCx=cx, radarCy=startY+130, radarR=110, n=data.catScores.length;
+    var angleStep=(2*Math.PI)/n, startAngle=-Math.PI/2;
+    // Grid
+    for(var g=1;g<=5;g++){var r=radarR*(g/5);ctx.beginPath();for(var i=0;i<=n;i++){var a=startAngle+i*angleStep;var px=radarCx+r*Math.cos(a);var py=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
+    // Axes
+    for(var i=0;i<n;i++){var a=startAngle+i*angleStep;ctx.beginPath();ctx.moveTo(radarCx,radarCy);ctx.lineTo(radarCx+radarR*Math.cos(a),radarCy+radarR*Math.sin(a));ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
+    // Data
+    ctx.beginPath();for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);var px=radarCx+r*Math.cos(a);var py=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.fillStyle='rgba(45,139,87,0.2)';ctx.fill();ctx.strokeStyle='#2D8B57';ctx.lineWidth=2;ctx.stroke();
+    // Points
+    for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.beginPath();ctx.arc(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#2D8B57';ctx.fill();}
+    // Labels
+    ctx.textAlign='center';
+    var sn=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
+    for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;var lx=radarCx+lR*Math.cos(a);var ly=radarCy+lR*Math.sin(a);ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(sn[i],lx,ly+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',lx,ly+18);}
+    ctx.textAlign='left';
   }
 
   function wrapText(ctx,text,maxW,font){ctx.font=font;var lines=[],cur='';for(var i=0;i<text.length;i++){var t=cur+text[i];if(ctx.measureText(t).width>maxW&&cur.length>0){lines.push(cur);cur=text[i];}else{cur=t;}}if(cur)lines.push(cur);return lines;}
