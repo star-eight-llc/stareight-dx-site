@@ -101,11 +101,11 @@
         score: data.totalPct,
         level: data.levelName || ('Level ' + data.level),
         cat_業務プロセス効率化: catFields['業務プロセス・効率化'] || '',
-        cat_Webオンライン: catFields['Web・オンライン活用'] || '',
-        cat_データ管理: catFields['データ管理・統合'] || '',
-        cat_データ活用: catFields['データ活用・分析'] || '',
+        cat_Webオンライン活用: catFields['Web・オンライン活用'] || '',
+        cat_データ管理統合: catFields['データ管理・統合'] || '',
+        cat_データ活用分析: catFields['データ活用・分析'] || '',
         cat_AI活用: catFields['AI活用'] || '',
-        cat_セキュリティ: catFields['セキュリティ・IT基盤'] || '',
+        cat_セキュリティIT基盤: catFields['セキュリティ・IT基盤'] || '',
         cat_DX推進体制: catFields['DX推進体制'] || '',
         top3: top3Str,
         referrer: document.referrer || '(direct)',
@@ -275,11 +275,12 @@
     y+=30;
 
     // ====== レーダーチャート（PDF用） ======
-    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}
+    if(!dryRun){try{ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}catch(e){console.log('radar title err',e);}}
     y+=30;
     var radarCx=cx, radarCy=y+130, radarR=110, n=data.catScores.length;
     var angleStep=(2*Math.PI)/n, startAngle=-Math.PI/2;
     if(!dryRun){
+      try{
       // Grid
       for(var g=1;g<=5;g++){var r=radarR*(g/5);ctx.beginPath();for(var i=0;i<=n;i++){var a=startAngle+i*angleStep;var x=radarCx+r*Math.cos(a);var ry=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(x,ry);else ctx.lineTo(x,ry);}ctx.closePath();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
       // Axes
@@ -292,8 +293,10 @@
       for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.beginPath();ctx.arc(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#2D8B57';ctx.fill();}
       // Labels
       ctx.textAlign='center';
-      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+26;var x=radarCx+lR*Math.cos(a);var ry=radarCy+lR*Math.sin(a);ctx.fillStyle='#333';ctx.font='bold 11px '+FONT;var lbl=data.catScores[i].icon+' '+data.catScores[i].name;if(lbl.length>10)lbl=data.catScores[i].icon+data.catScores[i].name.substring(0,8)+'…';ctx.fillText(lbl,x,ry+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 10px '+FONT;ctx.fillText(data.catScores[i].pct+'点',x,ry+16);}
+      var shortNames=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
+      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;var x=radarCx+lR*Math.cos(a);var ry=radarCy+lR*Math.sin(a);ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(shortNames[i]||data.catScores[i].name,x,ry+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',x,ry+18);}
       ctx.textAlign='left';
+      }catch(e){console.log('PDF radar chart error:',e);}
     }
     y+=radarR*2+80;
 
