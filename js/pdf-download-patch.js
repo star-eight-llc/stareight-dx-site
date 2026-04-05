@@ -308,8 +308,8 @@
     // カテゴリ別バー
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
-    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='15px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 16px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=10; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,10,5);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(10,(c.pct/100)*CW),10,5);ctx.fill();}} y+=14;if(!dryRun){ctx.fillStyle='#aaa';ctx.font='10px '+FONT;ctx.fillText('対応SERVICE：'+c.service,PAD,y);}y+=24; });
-    y+=25;
+    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='13px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 14px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=8; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,8,4);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(8,(c.pct/100)*CW),8,4);ctx.fill();}} y+=11;if(!dryRun){ctx.fillStyle='#aaa';ctx.font='9px '+FONT;ctx.fillText('対応SERVICE：'+c.service,PAD,y);}y+=18; });
+    y+=15;
 
     // ACTION TOP3
     var lowCats = data.sorted.filter(function(c) { return c.pct < 80; });
