@@ -100,13 +100,13 @@
         timestamp: now.toISOString(),
         score: data.totalPct,
         level: data.levelName || ('Level ' + data.level),
-        cat_業務プロセス: catFields['業務プロセス・効率化'] || '',
-        cat_Web活用: catFields['Web・オンライン活用'] || '',
-        cat_データ管理: catFields['データ管理・統合'] || '',
-        cat_データ活用: catFields['データ活用・分析'] || '',
-        cat_AI活用: catFields['AI活用'] || '',
-        cat_セキュリティ: catFields['セキュリティ・IT基盤'] || '',
-        cat_DX推進体制: catFields['DX推進体制'] || '',
+        cat1: catFields['業務プロセス・効率化'] || '',
+        cat2: catFields['Web・オンライン活用'] || '',
+        cat3: catFields['データ管理・統合'] || '',
+        cat4: catFields['データ活用・分析'] || '',
+        cat5: catFields['AI活用'] || '',
+        cat6: catFields['セキュリティ・IT基盤'] || '',
+        cat7: catFields['DX推進体制'] || '',
         top3: top3Str,
         referrer: document.referrer || '(direct)',
         utm_source: (new URLSearchParams(window.location.search)).get('utm_source') || '',
@@ -271,13 +271,13 @@
     y+=circleR*2+35;
     if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
-    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}
+    if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}else{var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);y+=lvLines.length*20;}
     y+=30;
 
     // ====== レーダーチャート（ブラウザCanvasをキャプチャ） ======
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}
     y+=30;
-    var radarH = 300;
+    var radarH = 320;
     if(!dryRun){
       // ブラウザ上のradarChartキャンバスをキャプチャして埋め込む
       var browserRadar = document.getElementById('radarChart');
@@ -286,7 +286,7 @@
           var radarW = 300;
           var radarX = cx - radarW/2;
           ctx.drawImage(browserRadar, radarX, y, radarW, radarW);
-          radarH = radarW + 20;
+          
         }catch(e){
           console.log('radar capture error, falling back to manual draw:', e);
           // フォールバック：手動描画
@@ -299,7 +299,7 @@
           ctx.textAlign='center';var sn=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
           for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(sn[i],radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+18);}
           ctx.textAlign='left';
-          radarH = 300;
+          
         }
       }
     }
