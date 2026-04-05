@@ -100,13 +100,13 @@
         timestamp: now.toISOString(),
         score: data.totalPct,
         level: data.levelName || ('Level ' + data.level),
-        cat_業務プロセス効率化: catFields['業務プロセス・効率化'] || '',
-        cat_Webオンライン活用: catFields['Web・オンライン活用'] || '',
-        cat_データ管理統合: catFields['データ管理・統合'] || '',
-        cat_データ活用分析: catFields['データ活用・分析'] || '',
-        cat_AI活用: catFields['AI活用'] || '',
-        cat_セキュリティIT基盤: catFields['セキュリティ・IT基盤'] || '',
-        cat_DX推進体制: catFields['DX推進体制'] || '',
+        '業務プロセス': catFields['業務プロセス・効率化'] || '',
+        'Web活用': catFields['Web・オンライン活用'] || '',
+        'データ管理': catFields['データ管理・統合'] || '',
+        'データ活用': catFields['データ活用・分析'] || '',
+        'AI活用': catFields['AI活用'] || '',
+        'セキュリティ': catFields['セキュリティ・IT基盤'] || '',
+        'DX推進体制': catFields['DX推進体制'] || '',
         top3: top3Str,
         referrer: document.referrer || '(direct)',
         utm_source: (new URLSearchParams(window.location.search)).get('utm_source') || '',
@@ -274,31 +274,36 @@
     if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}
     y+=30;
 
-    // ====== レーダーチャート（PDF用） ======
-    if(!dryRun){try{ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}catch(e){console.log('radar title err',e);}}
+    // ====== レーダーチャート（ブラウザCanvasをキャプチャ） ======
+    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}
     y+=30;
-    var radarCx=cx, radarCy=y+130, radarR=110, n=data.catScores.length;
-    var angleStep=(2*Math.PI)/n, startAngle=-Math.PI/2;
+    var radarH = 300;
     if(!dryRun){
-      try{
-      // Grid
-      for(var g=1;g<=5;g++){var r=radarR*(g/5);ctx.beginPath();for(var i=0;i<=n;i++){var a=startAngle+i*angleStep;var x=radarCx+r*Math.cos(a);var ry=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(x,ry);else ctx.lineTo(x,ry);}ctx.closePath();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-      // Axes
-      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;ctx.beginPath();ctx.moveTo(radarCx,radarCy);ctx.lineTo(radarCx+radarR*Math.cos(a),radarCy+radarR*Math.sin(a));ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
-      // Data fill
-      ctx.beginPath();
-      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);var x=radarCx+r*Math.cos(a);var ry=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(x,ry);else ctx.lineTo(x,ry);}
-      ctx.closePath();ctx.fillStyle='rgba(45,139,87,0.2)';ctx.fill();ctx.strokeStyle='#2D8B57';ctx.lineWidth=2;ctx.stroke();
-      // Data points
-      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.beginPath();ctx.arc(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#2D8B57';ctx.fill();}
-      // Labels
-      ctx.textAlign='center';
-      var shortNames=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
-      for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;var x=radarCx+lR*Math.cos(a);var ry=radarCy+lR*Math.sin(a);ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(shortNames[i]||data.catScores[i].name,x,ry+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',x,ry+18);}
-      ctx.textAlign='left';
-      }catch(e){console.log('PDF radar chart error:',e);}
+      // ブラウザ上のradarChartキャンバスをキャプチャして埋め込む
+      var browserRadar = document.getElementById('radarChart');
+      if(browserRadar){
+        try{
+          var radarW = 300;
+          var radarX = cx - radarW/2;
+          ctx.drawImage(browserRadar, radarX, y, radarW, radarW);
+          radarH = radarW + 20;
+        }catch(e){
+          console.log('radar capture error, falling back to manual draw:', e);
+          // フォールバック：手動描画
+          var radarCx=cx, radarCy=y+130, radarR=110, n=data.catScores.length;
+          var angleStep=(2*Math.PI)/n, startAngle=-Math.PI/2;
+          for(var g=1;g<=5;g++){var r=radarR*(g/5);ctx.beginPath();for(var i=0;i<=n;i++){var a=startAngle+i*angleStep;var px=radarCx+r*Math.cos(a);var py=radarCy+r*Math.sin(a);if(i===0)ctx.moveTo(px,py);else ctx.lineTo(px,py);}ctx.closePath();ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
+          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;ctx.beginPath();ctx.moveTo(radarCx,radarCy);ctx.lineTo(radarCx+radarR*Math.cos(a),radarCy+radarR*Math.sin(a));ctx.strokeStyle='#e2e8f0';ctx.lineWidth=1;ctx.stroke();}
+          ctx.beginPath();for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.lineTo(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a));}ctx.closePath();ctx.fillStyle='rgba(45,139,87,0.2)';ctx.fill();ctx.strokeStyle='#2D8B57';ctx.lineWidth=2;ctx.stroke();
+          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var r=radarR*(data.catScores[i].pct/100);ctx.beginPath();ctx.arc(radarCx+r*Math.cos(a),radarCy+r*Math.sin(a),4,0,Math.PI*2);ctx.fillStyle='#2D8B57';ctx.fill();}
+          ctx.textAlign='center';var sn=["業務プロセス","Web活用","データ管理","データ活用","AI活用","セキュリティ","DX推進体制"];
+          for(var i=0;i<n;i++){var a=startAngle+i*angleStep;var lR=radarR+32;ctx.fillStyle='#333';ctx.font='bold 12px '+FONT;ctx.fillText(sn[i],radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+4);ctx.fillStyle=getBarHex(data.catScores[i].pct);ctx.font='bold 11px '+FONT;ctx.fillText(data.catScores[i].pct+'点',radarCx+lR*Math.cos(a),radarCy+lR*Math.sin(a)+18);}
+          ctx.textAlign='left';
+          radarH = 300;
+        }
+      }
     }
-    y+=radarR*2+80;
+    y+=radarH;
 
     // カテゴリ別バー
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
@@ -307,17 +312,26 @@
     y+=25;
 
     // ACTION TOP3
-    if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('まず取り組むべきDXアクション TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,320,3);}
-    y+=32;
-    for(var i=0;i<3&&i<data.sorted.length;i++){
-      var cat=data.sorted[i],actionText=data.actionTexts[cat.name]||'';
-      var cardFont='14px '+FONT,lines=wrapText(ctx,actionText,CW-60,cardFont),cardH=38+lines.length*20+16;
-      if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,cardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,cardH,8);ctx.stroke();ctx.fillStyle=cat.color||'#2980b9';ctx.fillRect(PAD,y+8,4,cardH-16);}
-      var ix=PAD+20,iy=y+24;
-      if(!dryRun){ctx.fillStyle=cat.color||'#2980b9';ctx.font='bold 14px '+FONT;ctx.fillText('ACTION '+(i+1)+'：'+cat.icon+' '+cat.name+'（現在 '+cat.pct+'点）',ix,iy);}
-      iy+=22;
-      if(!dryRun){ctx.fillStyle='#555';ctx.font=cardFont;lines.forEach(function(l){ctx.fillText(l,ix,iy);iy+=20;});}
-      y+=cardH+18;
+    var lowCats = data.sorted.filter(function(c) { return c.pct < 80; });
+    if(lowCats.length === 0) {
+      if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('診断結果のまとめ',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
+      y+=32;
+      var congratsH=100;
+      if(!dryRun){ctx.fillStyle='#f0fdf4';roundRect(ctx,PAD,y,CW,congratsH,8);ctx.fill();ctx.strokeStyle='#bbf7d0';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,congratsH,8);ctx.stroke();ctx.fillStyle='#2D8B57';ctx.fillRect(PAD,y+8,4,congratsH-16);ctx.fillStyle='#2D8B57';ctx.font='bold 16px '+FONT;ctx.textAlign='center';ctx.fillText('素晴らしい結果です！全カテゴリで高い水準を達成しています。',cx,y+35);ctx.fillStyle='#555';ctx.font='14px '+FONT;ctx.fillText('より高い成果を目指したい場合は、ぜひ無料相談でご相談ください。',cx,y+60);ctx.textAlign='left';}
+      y+=congratsH+18;
+    } else {
+      if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('まず取り組むべきDXアクション TOP3',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,320,3);}
+      y+=32;
+      for(var i=0;i<3&&i<data.sorted.length;i++){
+        var cat=data.sorted[i],actionText=data.actionTexts[cat.name]||'';
+        var cardFont='14px '+FONT,lines=wrapText(ctx,actionText,CW-60,cardFont),cardH=38+lines.length*20+16;
+        if(!dryRun){ctx.fillStyle='#f8fafb';roundRect(ctx,PAD,y,CW,cardH,8);ctx.fill();ctx.strokeStyle='#e0e8ef';ctx.lineWidth=1;roundRect(ctx,PAD,y,CW,cardH,8);ctx.stroke();ctx.fillStyle=cat.color||'#2980b9';ctx.fillRect(PAD,y+8,4,cardH-16);}
+        var ix=PAD+20,iy=y+24;
+        if(!dryRun){ctx.fillStyle=cat.color||'#2980b9';ctx.font='bold 14px '+FONT;ctx.fillText('ACTION '+(i+1)+'：'+cat.icon+' '+cat.name+'（現在 '+cat.pct+'点）',ix,iy);}
+        iy+=22;
+        if(!dryRun){ctx.fillStyle='#555';ctx.font=cardFont;lines.forEach(function(l){ctx.fillText(l,ix,iy);iy+=20;});}
+        y+=cardH+18;
+      }
     }
     y+=35;
 
