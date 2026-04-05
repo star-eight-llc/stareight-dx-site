@@ -336,14 +336,26 @@ function showResults() {
 
   // (4) 課題TOP3 + アクション（SERVICE連動）
   html += '<div style="text-align:left;margin-bottom:32px;">';
-  html += '<h3 style="font-size:18px;margin-bottom:16px;">まず取り組むべきDXアクション TOP3</h3>';
-  for (var i = 0; i < 3 && i < sorted.length; i++) {
-    var tpl = catActions[sorted[i].name] || {};
-    html += '<div class="card" style="margin-bottom:12px;border-left:4px solid ' + (sorted[i].color || 'var(--blue)') + ';">';
-    html += '<div style="font-size:12px;color:' + (sorted[i].color || 'var(--blue)') + ';font-weight:700;margin-bottom:8px;">ACTION ' + (i+1) + '：' + sorted[i].icon + ' ' + sorted[i].name + '（現在 ' + sorted[i].pct + '点）</div>';
-    html += '<p style="font-size:14px;margin-bottom:8px;color:var(--gray-600);">' + (tpl.issue || '') + '</p>';
-    html += '<p style="font-size:14px;font-weight:600;color:var(--navy);">' + (tpl.action || '') + '</p>';
+  // 全カテゴリ80点以上の場合は称賛メッセージ
+  var lowCats = sorted.filter(function(c) { return c.pct < 80; });
+  if (lowCats.length === 0) {
+    html += '<h3 style="font-size:18px;margin-bottom:16px;">診断結果のまとめ</h3>';
+    html += '<div class="card" style="margin-bottom:12px;border-left:4px solid #2D8B57;padding:20px;">';
+    html += '<div style="font-size:28px;text-align:center;margin-bottom:8px;">🎉</div>';
+    html += '<div style="font-size:16px;font-weight:700;color:#2D8B57;text-align:center;margin-bottom:12px;">素晴らしい結果です！全カテゴリで高い水準を達成しています。</div>';
+    html += '<p style="font-size:14px;color:var(--gray-600);text-align:center;margin-bottom:8px;">御社のDXの取り組みは非常に進んでいます。ここからさらに成果を高めるには、データ分析の高度化やAI活用の本格展開が効果的です。</p>';
+    html += '<p style="font-size:14px;font-weight:600;color:var(--navy);text-align:center;">より高い成果を目指したい場合は、ぜひ無料相談でご相談ください。御社の状況に合わせた次のステップをご提案します。</p>';
     html += '</div>';
+  } else {
+    html += '<h3 style="font-size:18px;margin-bottom:16px;">まず取り組むべきDXアクション TOP3</h3>';
+    for (var i = 0; i < 3 && i < sorted.length; i++) {
+      var tpl = catActions[sorted[i].name] || {};
+      html += '<div class="card" style="margin-bottom:12px;border-left:4px solid ' + (sorted[i].color || 'var(--blue)') + ';">';
+      html += '<div style="font-size:12px;color:' + (sorted[i].color || 'var(--blue)') + ';font-weight:700;margin-bottom:8px;">ACTION ' + (i+1) + '：' + sorted[i].icon + ' ' + sorted[i].name + '（現在 ' + sorted[i].pct + '点）</div>';
+      html += '<p style="font-size:14px;margin-bottom:8px;color:var(--gray-600);">' + (tpl.issue || '') + '</p>';
+      html += '<p style="font-size:14px;font-weight:600;color:var(--navy);">' + (tpl.action || '') + '</p>';
+      html += '</div>';
+    }
   }
   html += '</div>';
 
