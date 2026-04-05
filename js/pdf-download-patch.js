@@ -265,10 +265,10 @@
     var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
     var PAD = 50, CW = W - PAD * 2, y = 0, headerH = 90;
     if (!dryRun) { ctx.fillStyle='#1a5276'; ctx.fillRect(0,0,W,headerH); ctx.fillStyle='#fff'; ctx.font='bold 15px '+FONT; ctx.fillText('★ StarEight DX Consulting',PAD,35); ctx.font='bold 26px '+FONT; ctx.fillText('DX診断レポート',PAD,65); ctx.font='13px '+FONT; ctx.textAlign='right'; ctx.fillText('診断日：'+dateStr,W-PAD,65); ctx.textAlign='left'; }
-    y=headerH+25;
+    y=headerH+15;
     var cx=W/2, lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
-    y+=circleR*2+25;
+    y+=circleR*2+35;
     if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
     if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}else{var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);y+=lvLines.length*20;}
@@ -308,7 +308,7 @@
     // カテゴリ別バー
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
-    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='13px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 13px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=12; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,7,3);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(7,(c.pct/100)*CW),7,3);ctx.fill();}} y+=16; });
+    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='13px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 13px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=15; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,7,3);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(7,(c.pct/100)*CW),7,3);ctx.fill();}} y+=20; });
     y+=15;
 
     // ACTION TOP3
