@@ -268,16 +268,16 @@
     y=headerH+50;
     var cx=W/2, lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
-    y+=circleR*2+35;
+    y+=circleR*2+25;
     if(!dryRun){ctx.fillStyle=lc;ctx.font='bold 26px '+FONT;ctx.textAlign='center';ctx.fillText('DXレベル：'+(data.levelName||data.level),cx,y);}
     y+=22;
     if(!dryRun){ctx.fillStyle='#777';ctx.font='15px '+FONT;ctx.textAlign='center';var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);lvLines.forEach(function(l){ctx.fillText(l,cx,y);y+=20;});ctx.textAlign='left';}else{var lvLines=wrapText(ctx,data.levelMsg,CW-40,'15px '+FONT);y+=lvLines.length*20;}
-    y+=30;
+    y+=20;
 
     // ====== レーダーチャート（ブラウザCanvasをキャプチャ） ======
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.textAlign='left';ctx.fillText('7カテゴリ別スコア（レーダーチャート）',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,280,3);}
     y+=30;
-    var radarH = 320;
+    var radarH = 300;
     if(!dryRun){
       // ブラウザ上のradarChartキャンバスをキャプチャして埋め込む
       var browserRadar = document.getElementById('radarChart');
@@ -308,7 +308,7 @@
     // カテゴリ別バー
     if(!dryRun){ctx.fillStyle='#1a5276';ctx.font='bold 20px '+FONT;ctx.fillText('カテゴリ別スコア',PAD,y);ctx.fillStyle='#2980b9';ctx.fillRect(PAD,y+6,160,3);}
     y+=30;
-    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='14px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 14px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=14; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,8,4);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(8,(c.pct/100)*CW),8,4);ctx.fill();}} y+=14;if(!dryRun){ctx.fillStyle='#aaa';ctx.font='9px '+FONT;ctx.fillText('対応SERVICE：'+c.service,PAD,y);}y+=16; });
+    data.catScores.forEach(function(c){ var bc=getBarHex(c.pct); if(!dryRun){ctx.fillStyle='#333';ctx.font='13px '+FONT;ctx.textAlign='left';ctx.fillText(c.icon+'  '+c.name,PAD,y);ctx.fillStyle=bc;ctx.font='bold 13px '+FONT;ctx.textAlign='right';ctx.fillText(c.pct+'点',W-PAD,y);ctx.textAlign='left';} y+=12; if(!dryRun){ctx.fillStyle='#eee';roundRect(ctx,PAD,y,CW,7,3);ctx.fill();if(c.pct>0){ctx.fillStyle=bc;roundRect(ctx,PAD,y,Math.max(7,(c.pct/100)*CW),7,3);ctx.fill();}} y+=16; });
     y+=15;
 
     // ACTION TOP3
