@@ -265,7 +265,7 @@
     var FONT = '"Noto Sans JP","Hiragino Sans","Hiragino Kaku Gothic ProN","Meiryo",sans-serif';
     var PAD = 50, CW = W - PAD * 2, y = 0, headerH = 90;
     if (!dryRun) { ctx.fillStyle='#1a5276'; ctx.fillRect(0,0,W,headerH); ctx.fillStyle='#fff'; ctx.font='bold 15px '+FONT; ctx.fillText('★ StarEight DX Consulting',PAD,35); ctx.font='bold 26px '+FONT; ctx.fillText('DX診断レポート',PAD,65); ctx.font='13px '+FONT; ctx.textAlign='right'; ctx.fillText('診断日：'+dateStr,W-PAD,65); ctx.textAlign='left'; }
-    y=headerH+50;
+    y=headerH+25;
     var cx=W/2, lc=getLevelHex(data.level), circleR=62;
     if(!dryRun){ ctx.beginPath();ctx.arc(cx,y+circleR,circleR+4,0,Math.PI*2);ctx.fillStyle='#f5f5f5';ctx.fill(); ctx.beginPath();ctx.arc(cx,y+circleR,circleR,0,Math.PI*2);ctx.strokeStyle=lc;ctx.lineWidth=6;ctx.stroke(); ctx.fillStyle=lc;ctx.font='bold 56px '+FONT;ctx.textAlign='center';ctx.fillText(String(data.totalPct),cx,y+circleR+12); ctx.fillStyle='#999';ctx.font='15px '+FONT;ctx.fillText('/ 100点',cx,y+circleR+34); }
     y+=circleR*2+25;
