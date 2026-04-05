@@ -131,11 +131,20 @@
 
   function loadJsPdf(cb) {
     if (_jspdfLoaded && window.jspdf) { cb(); return; }
-    var u = ['https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js'];
-    var s = document.createElement('script'); s.src = u[0];
-    s.onload = function() { if (window.jspdf) { _jspdfLoaded = true; cb(); } else { cb(new Error('jsPDF読込失敗')); } };
-    s.onerror = function() { cb(new Error('jsPDF読込失敗')); };
-    document.head.appendChild(s);
+    if (window.jspdf) { _jspdfLoaded = true; cb(); return; }
+    var urls = [
+      'https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js',
+      'https://unpkg.com/jspdf@2.5.2/dist/jspdf.umd.min.js',
+      'https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js'
+    ];
+    function tryLoad(idx) {
+      if (idx >= urls.length) { cb(new Error('jsPDFの読み込みに失敗しました。ブラウザのキャッシュをクリアして再度お試しください。')); return; }
+      var s = document.createElement('script'); s.src = urls[idx];
+      s.onload = function() { if (window.jspdf) { _jspdfLoaded = true; cb(); } else { tryLoad(idx + 1); } };
+      s.onerror = function() { tryLoad(idx + 1); };
+      document.head.appendChild(s);
+    }
+    tryLoad(0);
   }
 
   function onClickPdf() {
