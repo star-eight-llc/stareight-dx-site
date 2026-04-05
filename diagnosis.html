@@ -316,7 +316,7 @@ function showResults() {
   // (2) レーダーチャート
   html += '<div style="text-align:center;margin-bottom:32px;">';
   html += '<h3 style="font-size:18px;margin-bottom:16px;text-align:left;">7カテゴリ別スコア</h3>';
-  html += '<canvas id="radarChart" width="380" height="380" style="max-width:100%;"></canvas>';
+  html += '<canvas id="radarChart" width="460" height="460" style="max-width:100%;"></canvas>';
   html += '</div>';
 
   // (3) カテゴリ別バーチャート
@@ -401,10 +401,11 @@ function drawRadarChart(catScores) {
   if (!canvas) return;
   var ctx = canvas.getContext('2d');
   var W = canvas.width, H = canvas.height;
-  var cx = W / 2, cy = H / 2, R = 150;
+  var cx = W / 2, cy = H / 2, R = 140;
   var n = catScores.length;
   var angleStep = (2 * Math.PI) / n;
   var startAngle = -Math.PI / 2;
+  var shortNames = ["業務プロセス", "Web活用", "データ管理", "データ活用", "AI活用", "セキュリティ", "DX推進体制"];
 
   ctx.clearRect(0, 0, W, H);
 
@@ -470,21 +471,20 @@ function drawRadarChart(catScores) {
 
   // ラベル
   ctx.fillStyle = '#1E293B';
-  ctx.font = 'bold 11px sans-serif';
+  ctx.font = 'bold 12px sans-serif';
   ctx.textAlign = 'center';
   for (var i = 0; i < n; i++) {
     var a = startAngle + i * angleStep;
-    var lR = R + 28;
+    var lR = R + 38;
     var x = cx + lR * Math.cos(a);
     var y = cy + lR * Math.sin(a);
-    var label = catScores[i].icon + ' ' + catScores[i].name;
-    if (label.length > 10) label = catScores[i].icon + catScores[i].name.substring(0, 8) + '…';
+    var label = catScores[i].icon + ' ' + shortNames[i];
+    ctx.fillStyle = '#1E293B';
+    ctx.font = 'bold 12px sans-serif';
     ctx.fillText(label, x, y + 4);
     ctx.fillStyle = catScores[i].pct >= 60 ? '#2D8B57' : catScores[i].pct >= 40 ? '#E67E22' : '#CC4444';
-    ctx.font = 'bold 10px sans-serif';
-    ctx.fillText(catScores[i].pct + '点', x, y + 16);
-    ctx.fillStyle = '#1E293B';
     ctx.font = 'bold 11px sans-serif';
+    ctx.fillText(catScores[i].pct + '点', x, y + 18);
   }
 }
 </script>
