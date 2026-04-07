@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DX改善プラン策定（SERVICE 02） | スターエイト DXコンサルティング</title>
+<meta name="description" content="DX診断結果をもとに、何を・どの順番で・いくらかけて改善するかを90日間のロードマップで整理。納品物5点セット。実行支援ご発注時に全額値引き。">
+<link rel="stylesheet" href="css/style.css">
+<!-- Google Analytics 4 -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-70X6QJZSQX"></script>
+<script src="js/ga4-events.js"></script>
+<style>
+.s02-hero{position:relative;background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#2563eb 100%);padding:120px 0 80px;text-align:center;overflow:hidden;}
+.s02-hero::before{content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:radial-gradient(circle at 30% 50%,rgba(45,139,87,0.15) 0%,transparent 60%);pointer-events:none;}
+.s02-hero .container{position:relative;z-index:1;}
+.s02-hero .tag{display:inline-block;background:rgba(45,139,87,0.2);color:#6ee7b7;padding:4px 16px;border-radius:20px;font-size:13px;font-weight:600;margin-bottom:16px;}
+.s02-hero h1{color:#fff;font-size:36px;margin-bottom:12px;}
+.s02-hero .subtitle{color:#cbd5e1;font-size:16px;line-height:1.8;margin-bottom:24px;}
+.s02-price{display:inline-block;background:#fff;border-radius:10px;padding:12px 32px;box-shadow:0 4px 20px rgba(0,0,0,0.15);}
+.s02-price .amount{font-size:36px;font-weight:800;color:#1B3A5C;}
+.s02-price .unit{font-size:14px;color:#64748b;}
+.s02-price-note{color:#94a3b8;font-size:12px;margin-top:10px;}
+.pain-list{list-style:none;padding:0;margin:0 0 32px;}
+.pain-list li{display:flex;gap:10px;align-items:flex-start;margin-bottom:12px;font-size:15px;}
+.pain-list li::before{content:'✓';color:#E67E22;font-weight:700;font-size:18px;flex-shrink:0;margin-top:-1px;}
+.deliverable-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px;margin-bottom:32px;}
+.deliverable-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;transition:box-shadow 0.3s,transform 0.3s;}
+.deliverable-card:hover{box-shadow:0 8px 24px rgba(0,0,0,0.08);transform:translateY(-2px);}
+.deliverable-card .icon{width:48px;height:48px;border-radius:10px;background:#f0fdf4;display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:12px;}
+.deliverable-card h4{font-size:15px;color:#1B3A5C;margin-bottom:6px;}
+.deliverable-card p{font-size:13px;color:#64748b;line-height:1.6;}
+.phase-card{background:#fff;border-radius:12px;border:1px solid #e2e8f0;padding:20px;margin-bottom:16px;border-left:4px solid;}
+.phase-card h4{font-size:16px;margin-bottom:8px;}
+.phase-task{background:#f8fafc;border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;font-size:13px;}
+.phase-task .task-name{font-weight:600;color:#333;}
+.phase-task .task-cost{color:#2D8B57;font-weight:700;white-space:nowrap;}
+.phase-task .task-detail{font-size:12px;color:#64748b;margin-top:2px;}
+.flow-steps{display:flex;gap:8px;margin-bottom:32px;flex-wrap:wrap;justify-content:center;}
+.flow-step{flex:1;min-width:140px;max-width:200px;text-align:center;position:relative;}
+.flow-step .num{width:40px;height:40px;border-radius:50%;background:#2D8B57;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:16px;margin:0 auto 8px;}
+.flow-step h5{font-size:13px;color:#1B3A5C;margin-bottom:2px;}
+.flow-step p{font-size:11px;color:#94a3b8;}
+.flow-step::after{content:'→';position:absolute;right:-14px;top:12px;color:#cbd5e1;font-size:18px;}
+.flow-step:last-child::after{display:none;}
+.case-card{background:linear-gradient(135deg,#f0fdf4 0%,#f8fafc 100%);border:1px solid #bbf7d0;border-radius:12px;padding:24px;margin-bottom:32px;}
+.case-card .case-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;flex-wrap:wrap;gap:8px;}
+.case-card .case-title{font-size:14px;font-weight:700;color:#2D8B57;}
+.case-badge{display:inline-block;padding:3px 12px;border-radius:12px;font-size:11px;font-weight:600;}
+.case-card .metrics{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.matrix-grid{display:grid;grid-template-columns:1fr 1fr;gap:0;margin-bottom:24px;border-radius:12px;overflow:hidden;border:1px solid #e2e8f0;}
+.matrix-cell{padding:16px;font-size:13px;}
+.matrix-cell h5{font-size:12px;font-weight:700;margin-bottom:8px;}
+.matrix-cell p{margin-bottom:4px;}
+.summary-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px;}
+.summary-card{text-align:center;padding:16px;background:#f8fafc;border-radius:10px;border:1px solid #e2e8f0;}
+.summary-card .value{font-size:28px;font-weight:800;margin-bottom:4px;}
+.summary-card .label{font-size:12px;color:#64748b;}
+.s02-final-cta{background:#1B3A5C;border-radius:16px;padding:40px 24px;text-align:center;margin-top:40px;}
+.s02-final-cta h2{color:#fff;font-size:22px;margin-bottom:8px;}
+.s02-final-cta p{color:#CADCFC;font-size:14px;margin-bottom:20px;}
+.s02-final-cta .btn-group{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;}
+@media(max-width:768px){
+  .s02-hero h1{font-size:26px;}
+  .deliverable-grid{grid-template-columns:1fr;}
+  .summary-grid{grid-template-columns:1fr;}
+  .flow-steps{flex-direction:column;align-items:center;}
+  .flow-step::after{display:none;}
+  .matrix-grid{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <nav class="nav-inner">
+    <a href="index.html" class="nav-logo"><span class="star">★</span> StarEight <span class="dx-badge">デジタルソリューション</span></a>
+    <ul class="nav-links">
+      <li><a href="services.html">サービス</a></li>
+      <li><a href="diagnosis.html">無料DX診断</a></li>
+      <li><a href="cases.html">支援内容の具体例</a></li>
+      <li><a href="https://note.com/star_eight_llc" target="_blank" rel="noopener noreferrer">ブログ</a></li>
+      <li><a href="about.html">代表紹介</a></li>
+      <li><a href="contact.html" class="nav-cta">無料相談・お問い合わせ</a></li>
+    </ul>
+    <button class="hamburger" aria-label="メニュー"><span></span><span></span><span></span></button>
+  </nav>
+</header>
+
+<!-- ===== HERO ===== -->
+<section class="s02-hero">
+  <div class="container">
+    <span class="tag">SERVICE 02</span>
+    <h1>DX改善プラン策定</h1>
+    <p class="subtitle">診断結果をもとに「何を・どの順番で・いくらかけて」改善するか<br>90日間のロードマップで整理します</p>
+    <div class="s02-price">
+      <span class="amount">¥50,000</span><span class="unit">〜（税別）</span>
+    </div>
+    <p class="s02-price-note">※ 実行支援（SERVICE 03〜09）ご発注時に<strong style="color:#6ee7b7;">全額値引き</strong></p>
+  </div>
+</section>
+
+<!-- ===== お悩み ===== -->
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h2 style="text-align:center;margin-bottom:32px;">こんなお悩みありませんか？</h2>
+    <ul class="pain-list">
+      <li>DXが大事だとわかっているが、<strong>何から手をつければいいかわからない</strong></li>
+      <li>診断で課題は見えたが、<strong>具体的にどう進めればいいか整理できない</strong></li>
+      <li>ITベンダーに丸投げではなく、<strong>自分たちで理解して進めたい</strong></li>
+      <li>限られた予算で<strong>最大の効果を出したい</strong></li>
+    </ul>
+    <div style="text-align:center;padding:20px;background:#f0f7ff;border-radius:12px;border:1px solid #d0e3f0;">
+      <p style="font-size:15px;color:#1B3A5C;font-weight:600;margin-bottom:8px;">DX改善プラン策定は、診断結果を「実行できる計画」に変えるサービスです。</p>
+      <p style="font-size:13px;color:#64748b;">保険数理士（アクチュアリー）の定量分析スキルとデータサイエンスの知見を活かし、<br>「投資対効果」を数字で示す改善計画を策定します。</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 納品物5点セット ===== -->
+<section class="section" style="background:#f8fafc;">
+  <div class="container" style="max-width:900px;">
+    <h2 style="text-align:center;margin-bottom:8px;">納品物（5点セット）</h2>
+    <p style="text-align:center;color:#64748b;margin-bottom:32px;">5万円でここまでやります</p>
+    <div class="deliverable-grid">
+      <div class="deliverable-card">
+        <div class="icon">📋</div>
+        <h4>1. ヒアリング議事録</h4>
+        <p>60〜90分の詳細ヒアリングの全記録。業務フロー・使用ツール・課題TOP3・予算感を構造化して整理。ヒアリング直後に共有します。</p>
+      </div>
+      <div class="deliverable-card">
+        <div class="icon">📊</div>
+        <h4>2. 課題優先順位マトリクス</h4>
+        <p>影響度×実現容易性の4象限で課題を分類。「まずここから着手すべき」が一目でわかります。各課題にSERVICE番号を紐付け。</p>
+      </div>
+      <div class="deliverable-card">
+        <div class="icon">🗺️</div>
+        <h4>3. DX改善ロードマップ</h4>
+        <p>3フェーズ×6ヶ月の実行計画。各タスクに費用・期間・ROI・DXスコア改善シミュレーションを明記。</p>
+      </div>
+      <div class="deliverable-card">
+        <div class="icon">📑</div>
+        <h4>4. カスタマイズ提案書</h4>
+        <p>おすすめSERVICE TOP3の企業専用提案書。診断データに基づく具体的な費用対効果と投資回収期間を記載。</p>
+      </div>
+      <div class="deliverable-card" style="grid-column:1/-1;max-width:400px;margin:0 auto;">
+        <div class="icon">💰</div>
+        <h4>5. 投資サマリー</h4>
+        <p>6ヶ月間の総投資額と期待効果の一覧。社内稟議にそのまま使える形式です。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 納品物イメージ ===== -->
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h2 style="text-align:center;margin-bottom:8px;">納品物のイメージ</h2>
+    <p style="text-align:center;color:#64748b;margin-bottom:32px;">実際の納品物はこのような内容です（サンプル）</p>
+
+    <!-- 課題マトリクス -->
+    <h3 style="font-size:16px;color:#1B3A5C;margin-bottom:12px;">📊 課題優先順位マトリクス</h3>
+    <div class="matrix-grid">
+      <div class="matrix-cell" style="background:#dcfce7;">
+        <h5 style="color:#2D8B57;">★ 最優先（影響大×容易）</h5>
+        <p>• Excel月次集計の自動化 → <strong>SERVICE 05</strong></p>
+        <p>• HPリニューアル＋GA4 → <strong>SERVICE 04</strong></p>
+      </div>
+      <div class="matrix-cell" style="background:#fef3c7;">
+        <h5 style="color:#D97706;">計画的に（影響大×難）</h5>
+        <p>• 顧客DB構築 → <strong>SERVICE 05/06</strong></p>
+        <p>• AI活用基盤 → <strong>SERVICE 08</strong></p>
+      </div>
+      <div class="matrix-cell" style="background:#e0f2fe;">
+        <h5 style="color:#0284C7;">余裕があれば（影響小×容易）</h5>
+        <p>• アクセス権限管理 → <strong>SERVICE 03</strong></p>
+      </div>
+      <div class="matrix-cell" style="background:#f1f5f9;">
+        <h5 style="color:#94a3b8;">後回し（影響小×難）</h5>
+        <p style="color:#94a3b8;">• 現時点では該当なし</p>
+      </div>
+    </div>
+
+    <!-- ロードマップ -->
+    <h3 style="font-size:16px;color:#1B3A5C;margin-bottom:12px;">🗺️ DX改善ロードマップ（3フェーズ）</h3>
+    <div class="phase-card" style="border-left-color:#2D8B57;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h4 style="color:#2D8B57;">Phase 1：基盤整備</h4>
+        <span class="case-badge" style="background:#dcfce7;color:#2D8B57;">1〜2ヶ月</span>
+      </div>
+      <div class="phase-task"><div><span class="task-name">Excel月次集計の自動化</span><div class="task-detail">SERVICE 05 | ROI: 月40h削減 | 業務プロセス 60→90点</div></div><span class="task-cost">10万円</span></div>
+      <div class="phase-task"><div><span class="task-name">HPリニューアル＋GA4導入</span><div class="task-detail">SERVICE 04 | ROI: 問合せ月2→5件 | Web活用 50→88点</div></div><span class="task-cost">5万円</span></div>
+    </div>
+    <div class="phase-card" style="border-left-color:#2E75B6;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h4 style="color:#2E75B6;">Phase 2：活用推進</h4>
+        <span class="case-badge" style="background:#dbeafe;color:#2E75B6;">3〜4ヶ月</span>
+      </div>
+      <div class="phase-task"><div><span class="task-name">顧客データ統合＋ダッシュボード</span><div class="task-detail">SERVICE 06 | ROI: 会議準備50%削減 | データ管理 40→80点</div></div><span class="task-cost">10万円</span></div>
+      <div class="phase-task"><div><span class="task-name">売上分析スプリント</span><div class="task-detail">SERVICE 07 | ROI: 粗利率3%改善 | データ活用 30→70点</div></div><span class="task-cost">15万円</span></div>
+    </div>
+    <div class="phase-card" style="border-left-color:#7C3AED;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <h4 style="color:#7C3AED;">Phase 3：定着拡張</h4>
+        <span class="case-badge" style="background:#ede9fe;color:#7C3AED;">5〜6ヶ月</span>
+      </div>
+      <div class="phase-task"><div><span class="task-name">生成AI業務実装パック</span><div class="task-detail">SERVICE 08 | ROI: 文書作成60%削減 | AI活用 20→60点</div></div><span class="task-cost">10万円</span></div>
+      <div class="phase-task"><div><span class="task-name">DX顧問（継続伴走）</span><div class="task-detail">SERVICE 09 | ROI: PDCAの定着 | DX推進 33→83点</div></div><span class="task-cost">月額5万円</span></div>
+    </div>
+
+    <!-- 投資サマリー -->
+    <h3 style="font-size:16px;color:#1B3A5C;margin-bottom:12px;margin-top:32px;">💰 投資サマリー</h3>
+    <div class="summary-grid">
+      <div class="summary-card"><div class="value" style="color:#1B3A5C;">¥550,000</div><div class="label">6ヶ月間の総投資</div></div>
+      <div class="summary-card"><div class="value" style="color:#2D8B57;">¥180,000<span style="font-size:14px;">/月</span></div><div class="label">期待される月間削減効果</div></div>
+      <div class="summary-card"><div class="value" style="color:#E67E22;">約3.1ヶ月</div><div class="label">投資回収期間</div></div>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;text-align:center;">※ 上記は診断データとヒアリング内容に基づく試算です。実際の効果は業務内容により異なります。</p>
+  </div>
+</section>
+
+<!-- ===== ご利用の流れ ===== -->
+<section class="section" style="background:#f8fafc;">
+  <div class="container" style="max-width:800px;">
+    <h2 style="text-align:center;margin-bottom:32px;">ご利用の流れ</h2>
+    <div class="flow-steps">
+      <div class="flow-step"><div class="num">1</div><h5>無料DX診断</h5><p>30問・約5分</p></div>
+      <div class="flow-step"><div class="num">2</div><h5>無料相談</h5><p>Zoom 60分</p></div>
+      <div class="flow-step" style="background:#f0fdf4;border-radius:12px;padding:12px;border:2px solid #2D8B57;">
+        <div class="num" style="background:#1B3A5C;">3</div><h5 style="color:#2D8B57;">プラン策定</h5><p>約2〜3週間<br><strong>← 今ここ</strong></p>
+      </div>
+      <div class="flow-step"><div class="num">4</div><h5>実行支援</h5><p>SERVICE 03〜09</p></div>
+    </div>
+    <div style="text-align:center;padding:16px;background:#fff;border-radius:10px;border:1px solid #e2e8f0;">
+      <p style="font-size:14px;color:#1B3A5C;font-weight:600;">プラン策定の5万円は、実行支援ご発注時に全額値引きします</p>
+      <p style="font-size:12px;color:#64748b;">計画書のタスクを実行する ＝ スターエイトのサービスを発注する、という自然な流れです</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== 導入事例 ===== -->
+<section class="section">
+  <div class="container" style="max-width:800px;">
+    <h2 style="text-align:center;margin-bottom:32px;">導入事例</h2>
+    <div class="case-card">
+      <div class="case-header">
+        <span class="case-title">製造業 A社（従業員30名）</span>
+        <span class="case-badge" style="background:#dcfce7;color:#2D8B57;">DXスコア +35点</span>
+      </div>
+      <p style="font-size:15px;font-weight:700;color:#1B3A5C;margin-bottom:8px;">DX診断スコア：43点（改善着手期）→ 6ヶ月後：78点（基礎整備期）</p>
+      <p style="font-size:13px;color:#64748b;margin-bottom:12px;">月末のExcel集計に営業事務2名×丸2日（32時間）かかっていたが、SERVICE 05で自動化し2時間に短縮。SERVICE 06でKPIダッシュボードを導入し、経営会議の準備時間がゼロに。6ヶ月間の総投資55万円に対し、月間18万円の削減効果を実現。</p>
+      <div class="metrics">
+        <span class="case-badge" style="background:#f0fdf4;color:#2D8B57;">月30時間削減</span>
+        <span class="case-badge" style="background:#fef3c7;color:#D97706;">投資回収1.7ヶ月</span>
+        <span class="case-badge" style="background:#e0f2fe;color:#0284C7;">スコア43→78点</span>
+        <span class="case-badge" style="background:#fce7f3;color:#DB2777;">月18万円の効果</span>
+      </div>
+    </div>
+    <p style="font-size:12px;color:#94a3b8;text-align:center;">※ 上記は実際の支援事例をもとに再構成した導入イメージです。</p>
+  </div>
+</section>
+
+<!-- ===== CTA ===== -->
+<section class="section" style="padding-bottom:80px;">
+  <div class="container" style="max-width:800px;">
+    <div class="s02-final-cta">
+      <h2>まずは無料DX診断から始めませんか？</h2>
+      <p>30問・約5分で御社のDXの現在地がわかります。<br>診断結果をもとに、最適な改善プランをご提案します。</p>
+      <div class="btn-group">
+        <a href="diagnosis.html" class="btn btn-white" style="background:#fff;color:#1B3A5C;padding:12px 28px;border-radius:8px;font-weight:600;font-size:15px;text-decoration:none;">無料DX診断を受ける →</a>
+        <a href="contact.html" class="btn btn-ghost" style="border:1px solid rgba(255,255,255,0.3);color:#fff;padding:12px 28px;border-radius:8px;font-size:15px;text-decoration:none;">無料相談を予約する</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+// hamburger menu
+document.addEventListener('DOMContentLoaded', function() {
+  var hamburger = document.querySelector('.hamburger');
+  var navLinks = document.querySelector('.nav-links');
+  if (hamburger && navLinks) {
+    hamburger.addEventListener('click', function() {
+      navLinks.classList.toggle('active');
+      hamburger.classList.toggle('active');
+    });
+  }
+});
+</script>
+</body>
+</html>
